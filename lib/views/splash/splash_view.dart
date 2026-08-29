@@ -2,7 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../models/user_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
 import '../auth/login_view.dart';
+import '../main_nav_view.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -35,28 +39,40 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
     _animController.forward();
 
-    // Change status text after 1s
-    Timer(const Duration(milliseconds: 1200), () {
-      if (mounted) {
-        setState(() => _statusText = 'Optimizing Builder Engine...');
-      }
-    });
+    // Check auth session & seed database
+    _checkAuthAndNavigate();
+  }
 
-    // Navigate to LoginView
-    Timer(const Duration(milliseconds: 2400), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) => const LoginView(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
-            transitionDuration: const Duration(milliseconds: 500),
-          ),
-        );
-      }
-    });
+  Future<void> _checkAuthAndNavigate() async {
+    // Seed initial catalog in background if Firestore is empty
+    FirestoreService().seedDatabaseIfEmpty().catchError((_) {});
+
+    // Animate status text
+    await Future.delayed(const Duration(milliseconds: 1000));
+    if (mounted) {
+      setState(() => _statusText = 'Connecting to Hardware Cloud...');
+    }
+
+    final authService = AuthService();
+    final UserModel? user = await authService.getCurrentUserProfile();
+
+    await Future.delayed(const Duration(milliseconds: 1000));
+    if (!mounted) return;
+
+    final Widget destination = user != null
+        ? MainNavView(user: user)
+        : const LoginView();
+
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => destination,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
   }
 
   @override

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/widgets/custom_button.dart';
+import '../../models/user_model.dart';
+import '../../presenters/sign_up_presenter.dart';
 import 'login_view.dart';
+import 'sign_up_contract.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -11,7 +14,8 @@ class SignUpView extends StatefulWidget {
   State<SignUpView> createState() => _SignUpViewState();
 }
 
-class _SignUpViewState extends State<SignUpView> {
+class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
+  late final SignUpPresenter _presenter;
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -24,6 +28,12 @@ class _SignUpViewState extends State<SignUpView> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _presenter = SignUpPresenter(this);
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -32,43 +42,58 @@ class _SignUpViewState extends State<SignUpView> {
     super.dispose();
   }
 
-  void _handleSignUp() {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (!_agreedToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please agree to the Terms & Privacy Policy'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
+  // --- SignUpViewContract Implementation ---
+  @override
+  void showLoading() {
     setState(() => _isLoading = true);
+  }
 
-    // Simulate signup action / parsing data
-    Future.delayed(const Duration(seconds: 1), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+  @override
+  void hideLoading() {
+    setState(() => _isLoading = false);
+  }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully! Please sign in.'),
-          backgroundColor: AppColors.success,
-        ),
+  @override
+  void onSignUpSuccess(UserModel user) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Account created successfully! Please sign in.'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginView()),
+    );
+  }
+
+  @override
+  void onSignUpError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+      ),
+    );
+  }
+
+  void _handleSignUp() {
+    if (_formKey.currentState!.validate()) {
+      _presenter.signUp(
+        name: _nameController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+        confirmPassword: _confirmPasswordController.text,
+        agreedToTerms: _agreedToTerms,
       );
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginView()),
-      );
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -132,10 +157,11 @@ class _SignUpViewState extends State<SignUpView> {
                   TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: AppStrings.fullName,
                       hintText: AppStrings.fullNameHint,
-                      prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.textSecondary),
+                      prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.primary),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -150,16 +176,17 @@ class _SignUpViewState extends State<SignUpView> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: AppStrings.email,
                       hintText: AppStrings.emailHint,
-                      prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppColors.primary),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter your email';
                       }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim())) {
                         return 'Please enter a valid email address';
                       }
                       return null;
@@ -171,10 +198,11 @@ class _SignUpViewState extends State<SignUpView> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _isPasswordObscured,
+                    textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                       labelText: AppStrings.password,
                       hintText: AppStrings.passwordHint,
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -187,7 +215,7 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter a password';
+                        return 'Please enter your password';
                       }
                       if (value.length < 6) {
                         return 'Password must be at least 6 characters';
@@ -201,10 +229,12 @@ class _SignUpViewState extends State<SignUpView> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _isConfirmPasswordObscured,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => _handleSignUp(),
                     decoration: InputDecoration(
                       labelText: AppStrings.confirmPassword,
                       hintText: AppStrings.confirmPasswordHint,
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
+                      prefixIcon: const Icon(Icons.lock_reset_rounded, color: AppColors.primary),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isConfirmPasswordObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,

@@ -37,9 +37,9 @@ class AppStrings {
   static const String customBuilds = 'Custom Rigs';
 
   // Auth Strings
-  static const String loginTitle = 'Welcome Back!';
+  static const String loginTitle = 'Welcome Back';
   static const String loginSubtitle = 'Sign in to access your saved PC builds & orders';
-  static const String email = 'Email';
+  static const String email = 'Email Address';
   static const String emailHint = 'Enter your email';
   static const String password = 'Password';
   static const String passwordHint = 'Enter your password';

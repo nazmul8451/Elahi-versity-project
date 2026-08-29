@@ -117,4 +117,96 @@ class PcComponent {
     this.inStock = true,
     this.badge,
   });
+
+  static ComponentCategory parseCategory(dynamic val) {
+    if (val is ComponentCategory) return val;
+    if (val is int && val >= 0 && val < ComponentCategory.values.length) {
+      return ComponentCategory.values[val];
+    }
+    final str = val?.toString().toLowerCase().trim() ?? '';
+    for (var cat in ComponentCategory.values) {
+      if (cat.name.toLowerCase() == str ||
+          cat.shortName.toLowerCase() == str ||
+          cat.displayName.toLowerCase() == str) {
+        return cat;
+      }
+    }
+    return ComponentCategory.cpu;
+  }
+
+  factory PcComponent.fromJson(Map<String, dynamic> json, [String? docId]) {
+    final Map<String, String> parsedSpecs = {};
+    if (json['specs'] is Map) {
+      (json['specs'] as Map).forEach((k, v) {
+        parsedSpecs[k.toString()] = v?.toString() ?? '';
+      });
+    }
+
+    return PcComponent(
+      id: docId ?? (json['id']?.toString() ?? ''),
+      category: parseCategory(json['category']),
+      name: json['name']?.toString() ?? '',
+      brand: json['brand']?.toString() ?? '',
+      price: (json['price'] is num)
+          ? (json['price'] as num).toDouble()
+          : double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
+      wattage: (json['wattage'] is num)
+          ? (json['wattage'] as num).toInt()
+          : int.tryParse(json['wattage']?.toString() ?? '0') ?? 0,
+      socket: json['socket']?.toString() ?? 'N/A',
+      memoryType: json['memoryType']?.toString() ?? 'N/A',
+      formFactor: json['formFactor']?.toString() ?? 'ATX',
+      specs: parsedSpecs,
+      rating: (json['rating'] is num)
+          ? (json['rating'] as num).toDouble()
+          : double.tryParse(json['rating']?.toString() ?? '4.8') ?? 4.8,
+      reviewCount: (json['reviewCount'] is num)
+          ? (json['reviewCount'] as num).toInt()
+          : int.tryParse(json['reviewCount']?.toString() ?? '50') ?? 50,
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      inStock: json['inStock'] is bool
+          ? (json['inStock'] as bool)
+          : (json['inStock']?.toString().toLowerCase() != 'false'),
+      badge: json['badge']?.toString(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'category': category.name,
+      'name': name,
+      'brand': brand,
+      'price': price,
+      'wattage': wattage,
+      'socket': socket,
+      'memoryType': memoryType,
+      'formFactor': formFactor,
+      'specs': specs,
+      'rating': rating,
+      'reviewCount': reviewCount,
+      'imageUrl': imageUrl,
+      'inStock': inStock,
+      'badge': badge,
+    };
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'category': category.name,
+      'name': name,
+      'brand': brand,
+      'price': price,
+      'wattage': wattage,
+      'socket': socket,
+      'memoryType': memoryType,
+      'formFactor': formFactor,
+      'specs': specs,
+      'rating': rating,
+      'reviewCount': reviewCount,
+      'imageUrl': imageUrl,
+      'inStock': inStock,
+      'badge': badge,
+    };
+  }
 }

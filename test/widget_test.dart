@@ -6,7 +6,6 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const RigCraftApp());
     expect(find.byType(RigCraftApp), findsOneWidget);
-    // Advance timers so splash transitions
-    await tester.pumpAndSettle(const Duration(seconds: 3));
+    await tester.pump(const Duration(seconds: 3));
   });
 }

@@ -4,7 +4,11 @@ import '../../core/constants/app_data.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/live_badge.dart';
 import '../../models/custom_build_state.dart';
+import '../../models/order_model.dart';
+import '../../models/pc_build_model.dart';
 import '../../models/user_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
 import '../auth/login_view.dart';
 import 'saved_builds_sheet.dart';
 
@@ -160,23 +164,35 @@ class ProfileView extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: _statCard(
-            'Saved Rigs',
-            '${AppData.savedBuilds.length}',
-            Icons.memory_rounded,
-            AppColors.primary,
-            onTap: () => _openSavedBuilds(context),
+          child: StreamBuilder<List<PcBuildModel>>(
+            stream: FirestoreService().streamSavedBuilds(user.uid),
+            builder: (context, snapshot) {
+              final count = snapshot.data?.length ?? AppData.savedBuilds.length;
+              return _statCard(
+                'Saved Rigs',
+                '$count',
+                Icons.memory_rounded,
+                AppColors.primary,
+                onTap: () => _openSavedBuilds(context),
+              );
+            },
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
-          child: _statCard(
-            'Orders',
-            '${AppData.mockOrders.length}',
-            Icons.local_shipping_outlined,
-            AppColors.accentPurple,
-            onTap: () {
-              if (onNavigateToTab != null) onNavigateToTab!(2);
+          child: StreamBuilder<List<OrderModel>>(
+            stream: FirestoreService().streamUserOrders(user.uid),
+            builder: (context, snapshot) {
+              final count = snapshot.data?.length ?? AppData.mockOrders.length;
+              return _statCard(
+                'Orders',
+                '$count',
+                Icons.local_shipping_outlined,
+                AppColors.accentPurple,
+                onTap: () {
+                  if (onNavigateToTab != null) onNavigateToTab!(2);
+                },
+              );
             },
           ),
         ),
@@ -396,12 +412,16 @@ class ProfileView extends StatelessWidget {
                   child: const Text('Cancel'),
                 ),
                 TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.pop(ctx);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const LoginView()),
-                    );
+                    await AuthService().signOut();
+                    if (context.mounted) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => const LoginView()),
+                        (route) => false,
+                      );
+                    }
                   },
                   child: const Text('Sign Out', style: TextStyle(color: AppColors.error)),
                 ),

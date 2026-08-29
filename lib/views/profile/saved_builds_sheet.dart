@@ -4,6 +4,8 @@ import '../../core/constants/app_data.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/pc_build_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
 
 class SavedBuildsSheet extends StatelessWidget {
   final CustomBuildState customBuildState;
@@ -17,6 +19,9 @@ class SavedBuildsSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = AuthService().currentUser;
+    final userId = user?.uid ?? 'guest_user';
+
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: const BoxDecoration(
@@ -61,13 +66,42 @@ class SavedBuildsSheet extends StatelessWidget {
 
           // Builds List
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(20),
-              itemCount: AppData.savedBuilds.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 14),
-              itemBuilder: (context, idx) {
-                final build = AppData.savedBuilds[idx];
-                return _buildSavedCard(context, build);
+            child: StreamBuilder<List<PcBuildModel>>(
+              stream: FirestoreService().streamSavedBuilds(userId),
+              builder: (context, snapshot) {
+                final builds = snapshot.data ?? AppData.savedBuilds;
+
+                if (builds.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.bookmark_border_rounded, size: 48, color: AppColors.textLight),
+                        SizedBox(height: 12),
+                        Text(
+                          'No saved rigs found',
+                          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Use the "Save Rig" button in Builder to save configurations here.',
+                          style: TextStyle(fontSize: 12, color: AppColors.textLight),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  padding: const EdgeInsets.all(20),
+                  itemCount: builds.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 14),
+                  itemBuilder: (context, idx) {
+                    final build = builds[idx];
+                    return _buildSavedCard(context, build, userId);
+                  },
+                );
               },
             ),
           ),
@@ -76,7 +110,7 @@ class SavedBuildsSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildSavedCard(BuildContext context, PcBuildModel build) {
+  Widget _buildSavedCard(BuildContext context, PcBuildModel build, String userId) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -125,6 +159,21 @@ class SavedBuildsSheet extends StatelessWidget {
                     ),
                   ],
                 ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textLight, size: 20),
+                tooltip: 'Delete Saved Rig',
+                onPressed: () async {
+                  await FirestoreService().deleteSavedBuild(userId, build.id);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Saved rig removed.'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
               ),
             ],
           ),

@@ -28,6 +28,25 @@ extension OrderStatusExtension on OrderStatus {
   int get stepIndex {
     return OrderStatus.values.indexOf(this);
   }
+
+  static OrderStatus parse(dynamic val) {
+    if (val is OrderStatus) return val;
+    if (val is int && val >= 0 && val < OrderStatus.values.length) {
+      return OrderStatus.values[val];
+    }
+    final str = val?.toString().toLowerCase().trim() ?? '';
+    for (var s in OrderStatus.values) {
+      if (s.name.toLowerCase() == str || s.title.toLowerCase() == str) {
+        return s;
+      }
+    }
+    if (str.contains('pick')) return OrderStatus.partsPicked;
+    if (str.contains('assem')) return OrderStatus.assembly;
+    if (str.contains('stress') || str.contains('test')) return OrderStatus.stressTesting;
+    if (str.contains('ship')) return OrderStatus.shipped;
+    if (str.contains('deliv') || str.contains('complete')) return OrderStatus.delivered;
+    return OrderStatus.confirmed;
+  }
 }
 
 class OrderItemModel {
@@ -44,10 +63,37 @@ class OrderItemModel {
     this.quantity = 1,
     this.iconCode = '',
   });
+
+  factory OrderItemModel.fromJson(Map<String, dynamic> json) {
+    return OrderItemModel(
+      title: json['title']?.toString() ?? '',
+      subtitle: json['subtitle']?.toString() ?? '',
+      price: (json['price'] is num)
+          ? (json['price'] as num).toDouble()
+          : double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
+      quantity: (json['quantity'] is num)
+          ? (json['quantity'] as num).toInt()
+          : int.tryParse(json['quantity']?.toString() ?? '1') ?? 1,
+      iconCode: json['iconCode']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'subtitle': subtitle,
+      'price': price,
+      'quantity': quantity,
+      'iconCode': iconCode,
+    };
+  }
+
+  Map<String, dynamic> toFirestore() => toJson();
 }
 
 class OrderModel {
   final String id;
+  final String userId;
   final String orderDate;
   final String estimatedDelivery;
   final OrderStatus status;
@@ -60,6 +106,7 @@ class OrderModel {
 
   const OrderModel({
     required this.id,
+    this.userId = '',
     required this.orderDate,
     required this.estimatedDelivery,
     required this.status,
@@ -70,4 +117,65 @@ class OrderModel {
     required this.paymentMethod,
     required this.trackingNumber,
   });
+
+  factory OrderModel.fromJson(Map<String, dynamic> json, [String? docId]) {
+    final List<OrderItemModel> parsedItems = [];
+    if (json['items'] is List) {
+      for (var item in (json['items'] as List)) {
+        if (item is Map<String, dynamic>) {
+          parsedItems.add(OrderItemModel.fromJson(item));
+        } else if (item is Map) {
+          parsedItems.add(OrderItemModel.fromJson(Map<String, dynamic>.from(item)));
+        }
+      }
+    }
+
+    return OrderModel(
+      id: docId ?? (json['id']?.toString() ?? ''),
+      userId: json['userId']?.toString() ?? '',
+      orderDate: json['orderDate']?.toString() ?? '',
+      estimatedDelivery: json['estimatedDelivery']?.toString() ?? '',
+      status: OrderStatusExtension.parse(json['status']),
+      totalAmount: (json['totalAmount'] is num)
+          ? (json['totalAmount'] as num).toDouble()
+          : double.tryParse(json['totalAmount']?.toString() ?? '0') ?? 0.0,
+      buildName: json['buildName']?.toString() ?? 'Custom Rig Build',
+      items: parsedItems,
+      shippingAddress: json['shippingAddress']?.toString() ?? '',
+      paymentMethod: json['paymentMethod']?.toString() ?? 'Cash on Delivery',
+      trackingNumber: json['trackingNumber']?.toString() ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'orderDate': orderDate,
+      'estimatedDelivery': estimatedDelivery,
+      'status': status.name,
+      'totalAmount': totalAmount,
+      'buildName': buildName,
+      'items': items.map((i) => i.toJson()).toList(),
+      'shippingAddress': shippingAddress,
+      'paymentMethod': paymentMethod,
+      'trackingNumber': trackingNumber,
+    };
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'userId': userId,
+      'orderDate': orderDate,
+      'estimatedDelivery': estimatedDelivery,
+      'status': status.name,
+      'totalAmount': totalAmount,
+      'buildName': buildName,
+      'items': items.map((i) => i.toFirestore()).toList(),
+      'shippingAddress': shippingAddress,
+      'paymentMethod': paymentMethod,
+      'trackingNumber': trackingNumber,
+      'updatedAt': DateTime.now().toIso8601String(),
+    };
+  }
 }

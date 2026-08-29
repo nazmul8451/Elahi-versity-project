@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_data.dart';
 import '../../models/order_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
 import 'order_details_sheet.dart';
 
 class OrdersView extends StatefulWidget {
@@ -30,42 +32,51 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final activeOrders = AppData.mockOrders.where((o) => o.status != OrderStatus.delivered).toList();
-    final completedOrders = AppData.mockOrders.where((o) => o.status == OrderStatus.delivered).toList();
+    final user = AuthService().currentUser;
+    final userId = user?.uid ?? 'guest_user';
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'My Rig Orders',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
+    return StreamBuilder<List<OrderModel>>(
+      stream: FirestoreService().streamUserOrders(userId),
+      builder: (context, snapshot) {
+        final allOrders = snapshot.data ?? AppData.mockOrders;
+        final activeOrders = allOrders.where((o) => o.status != OrderStatus.delivered).toList();
+        final completedOrders = allOrders.where((o) => o.status == OrderStatus.delivered).toList();
+
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Text(
+              'My Rig Orders',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            bottom: TabBar(
+              controller: _tabController,
+              labelColor: AppColors.primary,
+              unselectedLabelColor: AppColors.textSecondary,
+              indicatorColor: AppColors.primary,
+              indicatorWeight: 3,
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              tabs: [
+                Tab(text: 'Active Builds (${activeOrders.length})'),
+                Tab(text: 'Completed (${completedOrders.length})'),
+              ],
+            ),
           ),
-        ),
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.primary,
-          unselectedLabelColor: AppColors.textSecondary,
-          indicatorColor: AppColors.primary,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: [
-            Tab(text: 'Active Builds (${activeOrders.length})'),
-            Tab(text: 'Completed (${completedOrders.length})'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildOrderList(activeOrders, isActive: true),
-          _buildOrderList(completedOrders, isActive: false),
-        ],
-      ),
+          body: TabBarView(
+            controller: _tabController,
+            children: [
+              _buildOrderList(activeOrders, isActive: true),
+              _buildOrderList(completedOrders, isActive: false),
+            ],
+          ),
+        );
+      },
     );
   }
 

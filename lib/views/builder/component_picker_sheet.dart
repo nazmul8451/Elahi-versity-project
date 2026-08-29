@@ -5,6 +5,7 @@ import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/live_badge.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/pc_component_model.dart';
+import '../../services/firestore_service.dart';
 
 class ComponentPickerSheet extends StatefulWidget {
   final ComponentCategory category;
@@ -26,23 +27,26 @@ class _ComponentPickerSheetState extends State<ComponentPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter components for this category
-    final categoryComponents = AppData.allComponents
-        .where((c) => c.category == widget.category)
-        .toList();
+    return StreamBuilder<List<PcComponent>>(
+      stream: FirestoreService().streamComponents(category: widget.category),
+      builder: (context, snapshot) {
+        final categoryComponents = snapshot.data ??
+            AppData.allComponents
+                .where((c) => c.category == widget.category)
+                .toList();
 
-    // Get unique brands
-    final brands = ['All', ...categoryComponents.map((c) => c.brand).toSet()];
+        // Get unique brands
+        final brands = ['All', ...categoryComponents.map((c) => c.brand).toSet()];
 
-    // Filter by search and brand
-    final filtered = categoryComponents.where((c) {
-      final matchesSearch = c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          c.brand.toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchesBrand = _selectedBrand == 'All' || c.brand == _selectedBrand;
-      return matchesSearch && matchesBrand;
-    }).toList();
+        // Filter by search and brand
+        final filtered = categoryComponents.where((c) {
+          final matchesSearch = c.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              c.brand.toLowerCase().contains(_searchQuery.toLowerCase());
+          final matchesBrand = _selectedBrand == 'All' || c.brand == _selectedBrand;
+          return matchesSearch && matchesBrand;
+        }).toList();
 
-    final currentlySelected = widget.customBuildState.selectedComponents[widget.category];
+        final currentlySelected = widget.customBuildState.selectedComponents[widget.category];
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
@@ -304,5 +308,7 @@ class _ComponentPickerSheetState extends State<ComponentPickerSheet> {
         ],
       ),
     );
+  },
+);
   }
 }

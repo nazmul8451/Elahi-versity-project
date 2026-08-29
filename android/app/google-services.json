@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "373143958345",
+    "project_id": "elahi-dashboard-admin",
+    "storage_bucket": "elahi-dashboard-admin.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373143958345:android:d40b433c1eed10e9a1a098",
+        "android_client_info": {
+          "package_name": "com.elahi_versity_project.elahi_admin_dashboard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuFeC909C2fR2CMsH5ffcb6s6vZtApOUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373143958345:android:f845d0d6436aa3e4a1a098",
+        "android_client_info": {
+          "package_name": "com.example.elahiversityproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuFeC909C2fR2CMsH5ffcb6s6vZtApOUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

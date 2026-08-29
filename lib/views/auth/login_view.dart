@@ -18,11 +18,11 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> implements LoginViewContract {
   late final LoginPresenter _presenter;
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController(text: 'builder@rigcraft.com');
-  final _passwordController = TextEditingController(text: '123456');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   bool _isPasswordObscured = true;
-  bool _rememberMe = false;
+  bool _rememberMe = true;
   bool _isLoading = false;
 
   @override
@@ -80,6 +80,20 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
     }
   }
 
+  void _fillDemoAccount() {
+    setState(() {
+      _emailController.text = 'builder@rigcraft.com';
+      _passwordController.text = '123456';
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Demo credentials loaded!'),
+        backgroundColor: AppColors.primary,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,20 +137,20 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                   const SizedBox(height: 20),
 
                   // Header Titles
-                  Text(
+                  const Text(
                     AppStrings.loginTitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
+                  const Text(
                     AppStrings.loginSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13,
                       color: AppColors.textSecondary,
                     ),
@@ -147,14 +161,19 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: AppStrings.email,
                       hintText: AppStrings.emailHint,
-                      prefixIcon: Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppColors.primary),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Please enter your email';
+                      }
+                      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return 'Please enter a valid email address';
                       }
                       return null;
                     },
@@ -165,10 +184,12 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _isPasswordObscured,
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (_) => _handleLogin(),
                     decoration: InputDecoration(
                       labelText: AppStrings.password,
                       hintText: AppStrings.passwordHint,
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.textSecondary),
+                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -182,6 +203,9 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters';
                       }
                       return null;
                     },
@@ -222,13 +246,31 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                         child: const Text(
                           AppStrings.forgotPassword,
                           style: TextStyle(
+                            fontSize: 13,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
-                            fontSize: 13,
                           ),
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Demo Credentials Quick Fill Chip
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: _fillDemoAccount,
+                      icon: const Icon(Icons.bolt_rounded, size: 16, color: AppColors.primary),
+                      label: const Text(
+                        'Autofill Demo Account',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+                      ),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppColors.primarySurface,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 24),
 

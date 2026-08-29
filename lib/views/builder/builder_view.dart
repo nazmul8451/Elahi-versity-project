@@ -3,6 +3,8 @@ import '../../core/constants/app_colors.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/pc_component_model.dart';
+import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
 import 'build_summary_dialog.dart';
 import 'component_picker_sheet.dart';
 
@@ -89,13 +91,45 @@ class BuilderView extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.bookmark_add_outlined, color: AppColors.primary),
                 tooltip: 'Save Rig',
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Custom build saved to profile!'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
+                onPressed: () async {
+                  if (customBuildState.selectedCount == 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please select at least one component to save a rig.'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final user = AuthService().currentUser;
+                  final uid = user?.uid ?? 'guest_user';
+
+                  try {
+                    await FirestoreService().saveCustomBuild(
+                      userId: uid,
+                      name: customBuildState.buildName,
+                      components: customBuildState.selectedComponents.values.toList(),
+                      totalPrice: customBuildState.totalPrice,
+                      totalWattage: customBuildState.totalEstimatedWattage,
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Custom build saved to Cloud Profile!'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Could not save build: $e'),
+                          backgroundColor: AppColors.error,
+                        ),
+                      );
+                    }
+                  }
                 },
               ),
               const SizedBox(width: 8),

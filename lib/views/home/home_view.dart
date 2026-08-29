@@ -10,6 +10,7 @@ import '../../models/custom_build_state.dart';
 import '../../models/pc_build_model.dart';
 import '../../models/pc_component_model.dart';
 import '../../models/user_model.dart';
+import '../../services/firestore_service.dart';
 import 'pc_details_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -480,14 +481,23 @@ class _HomeViewState extends State<HomeView> {
         const SizedBox(height: 8),
         SizedBox(
           height: 330,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
-            itemCount: AppData.featuredPrebuilts.length,
-            separatorBuilder: (context, index) => const SizedBox(width: 14),
-            itemBuilder: (context, index) {
-              final pc = AppData.featuredPrebuilts[index];
-              return _buildPrebuiltCard(pc);
+          child: StreamBuilder<List<PcBuildModel>>(
+            stream: FirestoreService().streamPrebuiltPcs(),
+            builder: (context, snapshot) {
+              final prebuilts = snapshot.data ?? AppData.featuredPrebuilts;
+              if (prebuilts.isEmpty) {
+                return const Center(child: Text('No pre-built systems found'));
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                itemCount: prebuilts.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 14),
+                itemBuilder: (context, index) {
+                  final pc = prebuilts[index];
+                  return _buildPrebuiltCard(pc);
+                },
+              );
             },
           ),
         ),
@@ -680,7 +690,6 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildTrendingComponentsSection() {
-    final trending = AppData.allComponents.take(4).toList();
     return Column(
       children: [
         Padding(
@@ -693,119 +702,135 @@ class _HomeViewState extends State<HomeView> {
           ),
         ),
         const SizedBox(height: 8),
-        ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: trending.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final comp = trending[index];
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.border),
-              ),
-              child: Row(
-                children: [
-                  AppNetworkImage(
-                    imageUrl: comp.imageUrl,
-                    width: 60,
-                    height: 60,
-                    borderRadius: BorderRadius.circular(10),
-                    fallbackIcon: comp.category.icon,
+        StreamBuilder<List<PcComponent>>(
+          stream: FirestoreService().streamComponents(),
+          builder: (context, snapshot) {
+            final list = (snapshot.data ?? AppData.allComponents).take(4).toList();
+            return ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: list.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
+                final comp = list[index];
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                  child: Row(
+                    children: [
+                      AppNetworkImage(
+                        imageUrl: comp.imageUrl,
+                        width: 60,
+                        height: 60,
+                        borderRadius: BorderRadius.circular(10),
+                        fallbackIcon: comp.category.icon,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySurface,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                comp.brand,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primary,
+                            Row(
+                              children: [
+                                Text(
+                                  comp.category.displayName,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
+                                if (comp.badge != null) ...[
+                                  const SizedBox(width: 6),
+                                  LiveBadge(text: comp.badge!),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              comp.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.textPrimary,
                               ),
                             ),
-                            if (comp.badge != null) ...[
-                              const SizedBox(width: 6),
-                              LiveBadge(
-                                text: comp.badge!,
-                                backgroundColor: AppColors.accentAmber.withValues(alpha: 0.2),
-                                textColor: AppColors.accentAmber,
-                              ),
-                            ],
+                            const SizedBox(height: 4),
+                            Text(
+                              comp.specs.entries.take(2).map((e) => '${e.key}: ${e.value}').join(' • '),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            ),
                           ],
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          comp.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '\$${comp.price.toStringAsFixed(2)} • ${comp.wattage}W TDP',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryDark,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primarySurface,
-                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.add_rounded, color: AppColors.primary, size: 20),
-                    ),
-                    tooltip: 'Add to PC Builder',
-                    onPressed: () {
-                      widget.customBuildState.selectComponent(comp);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Added ${comp.name} to Builder!'),
-                          backgroundColor: AppColors.primary,
-                          action: SnackBarAction(
-                            label: 'VIEW BUILD',
-                            textColor: Colors.white,
-                            onPressed: () => widget.onNavigateToTab(1),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '\$${comp.price.toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textPrimary,
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                          const SizedBox(height: 4),
+                          GestureDetector(
+                            onTap: () {
+                              widget.customBuildState.selectComponent(comp);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${comp.name} added to custom build!'),
+                                  backgroundColor: AppColors.primary,
+                                  duration: const Duration(seconds: 1),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primarySurface,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.add_rounded, size: 14, color: AppColors.primary),
+                                  SizedBox(width: 2),
+                                  Text(
+                                    'Add',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             );
           },
         ),
       ],
     );
   }
-
   Widget _buildTrustSection() {
     final trustItems = [
       {'icon': Icons.handshake_outlined, 'title': 'Free Assembly', 'desc': 'Cable routed & stress tested'},

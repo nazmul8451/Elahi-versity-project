@@ -5,6 +5,7 @@ import '../../core/widgets/live_badge.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/pc_build_model.dart';
 import '../../models/pc_component_model.dart';
+import '../builder/build_summary_dialog.dart';
 
 class PcDetailsView extends StatelessWidget {
   final PcBuildModel pc;
@@ -449,10 +450,23 @@ class PcDetailsView extends StatelessWidget {
                 flex: 2,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${pc.title} added to checkout cart!'),
-                        backgroundColor: AppColors.success,
+                    // Load into custom builder state
+                    customBuildState.loadComponents(
+                      pc.defaultComponents,
+                      buildName: pc.title,
+                    );
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (dialogCtx) => BuildSummaryDialog(
+                        customBuildState: customBuildState,
+                        onNavigateToTab: (tab) {
+                          Navigator.pop(context); // Close details view
+                          if (onNavigateToTab != null) {
+                            onNavigateToTab!(tab);
+                          }
+                        },
                       ),
                     );
                   },
