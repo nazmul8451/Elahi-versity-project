@@ -197,7 +197,7 @@ class BuilderView extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '\$${customBuildState.totalPrice.toStringAsFixed(2)}',
+                    '৳${customBuildState.totalPrice.toStringAsFixed(0)}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w800,
@@ -438,7 +438,7 @@ class BuilderView extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          '\$${item.price.toStringAsFixed(2)}',
+                          '৳${item.price.toStringAsFixed(0)}',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,

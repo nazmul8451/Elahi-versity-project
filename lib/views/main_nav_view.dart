@@ -59,76 +59,84 @@ class _MainNavViewState extends State<MainNavView> {
       ),
     ];
 
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
+    return PopScope(
+      canPop: _currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _currentIndex != 0) {
+          setState(() => _currentIndex = 0);
+        }
+      },
+      child: Scaffold(
+        body: IndexedStack(
+          index: _currentIndex,
+          children: screens,
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: _onTabSelected,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: AppColors.primary,
-          unselectedItemColor: AppColors.textLight,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
-          items: [
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              activeIcon: Icon(Icons.home_filled),
-              label: AppStrings.tabHome,
-            ),
-            BottomNavigationBarItem(
-              icon: ListenableBuilder(
-                listenable: _customBuildState,
-                builder: (context, _) {
-                  final count = _customBuildState.selectedCount;
-                  return Badge(
-                    isLabelVisible: count > 0,
-                    label: Text('$count'),
-                    backgroundColor: AppColors.primary,
-                    child: const Icon(Icons.build_circle_outlined),
-                  );
-                },
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, -4),
               ),
-              activeIcon: ListenableBuilder(
-                listenable: _customBuildState,
-                builder: (context, _) {
-                  final count = _customBuildState.selectedCount;
-                  return Badge(
-                    isLabelVisible: count > 0,
-                    label: Text('$count'),
-                    backgroundColor: AppColors.primaryDark,
-                    child: const Icon(Icons.build_circle_rounded),
-                  );
-                },
+            ],
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: _onTabSelected,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.white,
+            selectedItemColor: AppColors.primary,
+            unselectedItemColor: AppColors.textLight,
+            selectedFontSize: 12,
+            unselectedFontSize: 12,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+            items: [
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                activeIcon: Icon(Icons.home_filled),
+                label: AppStrings.tabHome,
               ),
-              label: AppStrings.tabBuilder,
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.local_shipping_outlined),
-              activeIcon: Icon(Icons.local_shipping_rounded),
-              label: AppStrings.tabOrders,
-            ),
-            const BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline_rounded),
-              activeIcon: Icon(Icons.person_rounded),
-              label: AppStrings.tabProfile,
-            ),
-          ],
+              BottomNavigationBarItem(
+                icon: ListenableBuilder(
+                  listenable: _customBuildState,
+                  builder: (context, _) {
+                    final count = _customBuildState.selectedCount;
+                    return Badge(
+                      isLabelVisible: count > 0,
+                      label: Text('$count'),
+                      backgroundColor: AppColors.primary,
+                      child: const Icon(Icons.build_circle_outlined),
+                    );
+                  },
+                ),
+                activeIcon: ListenableBuilder(
+                  listenable: _customBuildState,
+                  builder: (context, _) {
+                    final count = _customBuildState.selectedCount;
+                    return Badge(
+                      isLabelVisible: count > 0,
+                      label: Text('$count'),
+                      backgroundColor: AppColors.primaryDark,
+                      child: const Icon(Icons.build_circle_rounded),
+                    );
+                  },
+                ),
+                label: AppStrings.tabBuilder,
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.local_shipping_outlined),
+                activeIcon: Icon(Icons.local_shipping_rounded),
+                label: AppStrings.tabOrders,
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline_rounded),
+                activeIcon: Icon(Icons.person_rounded),
+                label: AppStrings.tabProfile,
+              ),
+            ],
+          ),
         ),
       ),
     );

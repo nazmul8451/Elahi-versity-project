@@ -5,6 +5,7 @@ enum OrderStatus {
   stressTesting,
   shipped,
   delivered,
+  cancelled,
 }
 
 extension OrderStatusExtension on OrderStatus {
@@ -22,10 +23,13 @@ extension OrderStatusExtension on OrderStatus {
         return 'Shipped with Express Courier';
       case OrderStatus.delivered:
         return 'Delivered & Completed';
+      case OrderStatus.cancelled:
+        return 'Cancelled';
     }
   }
 
   int get stepIndex {
+    if (this == OrderStatus.cancelled) return -1;
     return OrderStatus.values.indexOf(this);
   }
 
@@ -40,11 +44,13 @@ extension OrderStatusExtension on OrderStatus {
         return s;
       }
     }
-    if (str.contains('pick')) return OrderStatus.partsPicked;
-    if (str.contains('assem')) return OrderStatus.assembly;
-    if (str.contains('stress') || str.contains('test')) return OrderStatus.stressTesting;
-    if (str.contains('ship')) return OrderStatus.shipped;
+    if (str.contains('cancel')) return OrderStatus.cancelled;
     if (str.contains('deliv') || str.contains('complete')) return OrderStatus.delivered;
+    if (str.contains('ship')) return OrderStatus.shipped;
+    if (str.contains('stress') || str.contains('test')) return OrderStatus.stressTesting;
+    if (str.contains('assem') || str.contains('process')) return OrderStatus.assembly;
+    if (str.contains('pick')) return OrderStatus.partsPicked;
+    if (str.contains('pend') || str.contains('confirm')) return OrderStatus.confirmed;
     return OrderStatus.confirmed;
   }
 }

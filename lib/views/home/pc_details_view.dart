@@ -179,7 +179,7 @@ class PcDetailsView extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  '\$${pc.price.toStringAsFixed(2)}',
+                                  '৳${pc.price.toStringAsFixed(0)}',
                                   style: const TextStyle(
                                     fontSize: 26,
                                     fontWeight: FontWeight.w800,
@@ -189,7 +189,7 @@ class PcDetailsView extends StatelessWidget {
                                 if (pc.originalPrice != null) ...[
                                   const SizedBox(width: 8),
                                   Text(
-                                    '\$${pc.originalPrice!.toStringAsFixed(2)}',
+                                    '৳${pc.originalPrice!.toStringAsFixed(0)}',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: AppColors.textLight,
@@ -471,7 +471,7 @@ class PcDetailsView extends StatelessWidget {
                     );
                   },
                   icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 18),
-                  label: Text('Buy Now • \$${pc.price.toInt()}'),
+                  label: Text('Buy Now • ৳${pc.price.toInt()}'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,

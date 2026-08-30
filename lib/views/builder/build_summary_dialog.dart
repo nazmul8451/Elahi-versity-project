@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/app_network_image.dart';
+import '../../core/widgets/app_notification.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/order_model.dart';
 import '../../models/pc_component_model.dart';
@@ -241,7 +242,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                                 ),
                               ),
                               Text(
-                                '\$${comp.price.toStringAsFixed(2)}',
+                                '৳${comp.price.toStringAsFixed(0)}',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -299,7 +300,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                           activeColor: AppColors.primary,
                           contentPadding: EdgeInsets.zero,
                           title: const Text('Windows 11 Pro 64-bit License & Installed', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                          subtitle: const Text('+\$29.99 (Special bundle price)', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          subtitle: const Text('+৳2,500 (Special bundle price)', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                         ),
                       ],
                     ),
@@ -335,7 +336,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                         children: [
                           const Text('Grand Total', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                           Text(
-                            '\$${grandTotal.toStringAsFixed(2)}',
+                            '৳${grandTotal.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w800,
@@ -479,14 +480,15 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
               const SizedBox(height: 16),
               const Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
-              Row(
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   ChoiceChip(
                     label: const Text('Cash on Delivery'),
                     selected: selectedPayment == 'Cash on Delivery',
                     onSelected: (_) => setSheetState(() => selectedPayment = 'Cash on Delivery'),
                   ),
-                  const SizedBox(width: 8),
                   ChoiceChip(
                     label: const Text('bKash / Nagad'),
                     selected: selectedPayment == 'bKash / Nagad',
@@ -508,7 +510,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                     );
                   },
                   icon: const Icon(Icons.check_circle_rounded),
-                  label: Text('Confirm Order (\$${grandTotal.toStringAsFixed(2)})'),
+                  label: Text('Confirm Order (৳${grandTotal.toStringAsFixed(0)})'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -549,7 +551,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
         items.add(const OrderItemModel(
           title: 'Windows 11 Pro 64-bit License',
           subtitle: 'Installed and configured',
-          price: 29.99,
+          price: 1500.0,
           quantity: 1,
         ));
       }
@@ -566,6 +568,8 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
       if (!mounted) return;
       Navigator.pop(context); // Close summary dialog
 
+      final placedBuildName = widget.customBuildState.buildName;
+
       // Reset custom builder
       widget.customBuildState.reset();
 
@@ -574,12 +578,10 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
         widget.onNavigateToTab!(2);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Order #$orderId placed successfully! Live assembly tracking active.'),
-          backgroundColor: AppColors.success,
-          duration: const Duration(seconds: 4),
-        ),
+      AppNotification.showOrderPlaced(
+        context,
+        orderId: orderId,
+        buildName: placedBuildName.isEmpty ? 'Custom PC Rig' : placedBuildName,
       );
     } catch (e) {
       if (!mounted) return;

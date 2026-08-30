@@ -18,7 +18,7 @@ class RigCraftApp extends StatelessWidget {
   @override
   Widget build(BuildContext context)  {
     return MaterialApp(
-      title: 'RigCraft PC Builder',
+      title: 'PC Builder',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const SplashView(),

@@ -75,6 +75,7 @@ void main() {
       expect(OrderStatusExtension.parse('stressTesting'), OrderStatus.stressTesting);
       expect(OrderStatusExtension.parse('Shipped with Express Courier'), OrderStatus.shipped);
       expect(OrderStatusExtension.parse('delivered'), OrderStatus.delivered);
+      expect(OrderStatusExtension.parse('cancelled'), OrderStatus.cancelled);
 
       final orderJson = {
         'id': 'ord_1',

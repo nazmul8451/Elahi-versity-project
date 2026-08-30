@@ -1,7 +1,8 @@
 class AppStrings {
   // App Info
-  static const String appName = 'RigCraft PC';
+  static const String appName = 'PC Builder';
   static const String appTagline = 'Custom PC Builder & Hardware Store';
+  static const String currency = '৳';
 
   // Navigation Tabs
   static const String tabHome = 'Home';
@@ -49,7 +50,7 @@ class AppStrings {
   static const String signUpNow = 'Sign Up';
   static const String loginSuccess = 'Login Successful!';
   static const String signUpTitle = 'Create Account';
-  static const String signUpSubtitle = 'Join RigCraft to build, share & track custom PCs';
+  static const String signUpSubtitle = 'Join PC Builder to build, share & track custom PCs';
   static const String fullName = 'Full Name';
   static const String fullNameHint = 'Enter your full name';
   static const String confirmPassword = 'Confirm Password';

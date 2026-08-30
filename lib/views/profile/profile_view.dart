@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_data.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/live_badge.dart';
 import '../../models/custom_build_state.dart';
@@ -147,6 +146,8 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   user.email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -167,7 +168,7 @@ class ProfileView extends StatelessWidget {
           child: StreamBuilder<List<PcBuildModel>>(
             stream: FirestoreService().streamSavedBuilds(user.uid),
             builder: (context, snapshot) {
-              final count = snapshot.data?.length ?? AppData.savedBuilds.length;
+              final count = snapshot.data?.length ?? 0;
               return _statCard(
                 'Saved Rigs',
                 '$count',
@@ -183,7 +184,7 @@ class ProfileView extends StatelessWidget {
           child: StreamBuilder<List<OrderModel>>(
             stream: FirestoreService().streamUserOrders(user.uid),
             builder: (context, snapshot) {
-              final count = snapshot.data?.length ?? AppData.mockOrders.length;
+              final count = snapshot.data?.length ?? 0;
               return _statCard(
                 'Orders',
                 '$count',
@@ -275,55 +276,100 @@ class ProfileView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 8),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: AppData.savedBuilds.take(2).length,
-            separatorBuilder: (context, index) => const Divider(height: 16, color: AppColors.border),
-            itemBuilder: (context, idx) {
-              final build = AppData.savedBuilds[idx];
-              return Row(
-                children: [
-                  AppNetworkImage(
-                    imageUrl: build.imageUrl,
-                    width: 50,
-                    height: 50,
-                    borderRadius: BorderRadius.circular(10),
-                    fallbackIcon: Icons.computer_rounded,
+          StreamBuilder<List<PcBuildModel>>(
+            stream: FirestoreService().streamSavedBuilds(user.uid),
+            builder: (context, snapshot) {
+              final builds = snapshot.data ?? [];
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                );
+              }
+
+              if (builds.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Center(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          build.title,
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        const Icon(Icons.bookmark_border_rounded, size: 28, color: AppColors.textLight),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'No custom rigs saved yet',
+                          style: TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
                         ),
-                        Text(
-                          '\$${build.price.toStringAsFixed(0)} • ${build.gpu.split(' ').take(2).join(' ')}',
-                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Use "Save Rig" in Builder to save configurations',
+                          style: TextStyle(fontSize: 11, color: AppColors.textLight),
                         ),
                       ],
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.build_circle_rounded, color: AppColors.primary),
-                    tooltip: 'Load to Builder',
-                    onPressed: () {
-                      customBuildState.loadComponents(
-                        build.defaultComponents,
-                        buildName: build.title,
-                      );
-                      if (onNavigateToTab != null) {
-                        onNavigateToTab!(1); // Switch to Builder tab
-                      }
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Loaded ${build.title} into Custom Builder!')),
-                      );
-                    },
-                  ),
-                ],
+                );
+              }
+
+              final displayList = builds.take(2).toList();
+              return ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: displayList.length,
+                separatorBuilder: (context, index) => const Divider(height: 16, color: AppColors.border),
+                itemBuilder: (context, idx) {
+                  final build = displayList[idx];
+                  return Row(
+                    children: [
+                      AppNetworkImage(
+                        imageUrl: build.imageUrl,
+                        width: 50,
+                        height: 50,
+                        borderRadius: BorderRadius.circular(10),
+                        fallbackIcon: Icons.computer_rounded,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              build.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              '৳${build.price.toStringAsFixed(0)} • ${build.gpu.split(' ').take(2).join(' ')}',
+                              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.build_circle_rounded, color: AppColors.primary),
+                        tooltip: 'Load to Builder',
+                        onPressed: () {
+                          customBuildState.loadComponents(
+                            build.defaultComponents,
+                            buildName: build.title,
+                          );
+                          if (onNavigateToTab != null) {
+                            onNavigateToTab!(1);
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Loaded "${build.title}" into Builder!')),
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
               );
             },
           ),
@@ -405,7 +451,7 @@ class ProfileView extends StatelessWidget {
             context: context,
             builder: (ctx) => AlertDialog(
               title: const Text('Sign Out?'),
-              content: const Text('Are you sure you want to sign out from RigCraft?'),
+              content: const Text('Are you sure you want to sign out from PC Builder?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),

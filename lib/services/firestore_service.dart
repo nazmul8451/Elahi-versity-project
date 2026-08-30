@@ -31,13 +31,10 @@ class FirestoreService {
   // 1. COMPONENTS CATALOG
   // =========================================================================
 
-  /// Stream components from Firestore with automatic fallback to local AppData if empty
+  /// Stream components purely from Cloud Firestore
   Stream<List<PcComponent>> streamComponents({ComponentCategory? category}) {
     if (_componentsCol == null) {
-      if (category != null) {
-        return Stream.value(AppData.allComponents.where((c) => c.category == category).toList());
-      }
-      return Stream.value(AppData.allComponents);
+      return Stream.value([]);
     }
 
     Query<Map<String, dynamic>> query = _componentsCol!;
@@ -46,22 +43,11 @@ class FirestoreService {
     }
 
     return query.snapshots().map((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        if (category != null) {
-          return AppData.allComponents.where((c) => c.category == category).toList();
-        }
-        return AppData.allComponents;
-      }
       return snapshot.docs.map((doc) => PcComponent.fromJson(doc.data(), doc.id)).toList();
-    }).handleError((_) {
-      if (category != null) {
-        return AppData.allComponents.where((c) => c.category == category).toList();
-      }
-      return AppData.allComponents;
-    });
+    }).handleError((_) => <PcComponent>[]);
   }
 
-  /// One-time fetch of components
+  /// One-time fetch of components purely from Cloud Firestore
   Future<List<PcComponent>> getComponents({ComponentCategory? category}) async {
     try {
       if (_componentsCol != null) {
@@ -70,75 +56,60 @@ class FirestoreService {
           query = query.where('category', isEqualTo: category.name);
         }
         final snapshot = await query.get();
-        if (snapshot.docs.isNotEmpty) {
-          return snapshot.docs
-              .map((doc) => PcComponent.fromJson(doc.data(), doc.id))
-              .toList();
-        }
+        return snapshot.docs
+            .map((doc) => PcComponent.fromJson(doc.data(), doc.id))
+            .toList();
       }
     } catch (_) {}
-
-    if (category != null) {
-      return AppData.allComponents.where((c) => c.category == category).toList();
-    }
-    return AppData.allComponents;
+    return [];
   }
 
   // =========================================================================
   // 2. PREBUILT PCS STORE
   // =========================================================================
 
-  /// Stream pre-built PCs with fallback to AppData.featuredPrebuilts
+  /// Stream pre-built PCs purely from Cloud Firestore
   Stream<List<PcBuildModel>> streamPrebuiltPcs() {
     if (_prebuiltPcsCol == null) {
-      return Stream.value(AppData.featuredPrebuilts);
+      return Stream.value([]);
     }
     return _prebuiltPcsCol!.snapshots().map((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        return AppData.featuredPrebuilts;
-      }
       return snapshot.docs
           .map((doc) => PcBuildModel.fromJson(doc.data(), doc.id))
           .toList();
-    }).handleError((_) => AppData.featuredPrebuilts);
+    }).handleError((_) => <PcBuildModel>[]);
   }
 
-  /// One-time fetch of pre-built systems
+  /// One-time fetch of pre-built systems purely from Cloud Firestore
   Future<List<PcBuildModel>> getPrebuiltPcs() async {
     try {
       if (_prebuiltPcsCol != null) {
         final snapshot = await _prebuiltPcsCol!.get();
-        if (snapshot.docs.isNotEmpty) {
-          return snapshot.docs
-              .map((doc) => PcBuildModel.fromJson(doc.data(), doc.id))
-              .toList();
-        }
+        return snapshot.docs
+            .map((doc) => PcBuildModel.fromJson(doc.data(), doc.id))
+            .toList();
       }
     } catch (_) {}
-    return AppData.featuredPrebuilts;
+    return [];
   }
 
   // =========================================================================
   // 3. ORDERS & REAL-TIME TRACKING
   // =========================================================================
 
-  /// Stream orders for a specific user. If Firestore has no orders for this user,
-  /// returns mock active & completed orders for seamless initial experience.
+  /// Stream orders purely for the authenticated user from Cloud Firestore
   Stream<List<OrderModel>> streamUserOrders(String userId) {
     if (_ordersCol == null) {
-      return Stream.value(AppData.mockOrders);
+      return Stream.value([]);
     }
     return _ordersCol!
         .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        return AppData.mockOrders;
-      }
       return snapshot.docs
           .map((doc) => OrderModel.fromJson(doc.data(), doc.id))
           .toList();
-    }).handleError((_) => AppData.mockOrders);
+    }).handleError((_) => <OrderModel>[]);
   }
 
   /// Place a new custom or prebuilt PC order to Firestore
@@ -183,6 +154,26 @@ class FirestoreService {
     return docId;
   }
 
+  /// Stream a single order by ID in real-time
+  Stream<OrderModel?> streamOrder(String orderId) {
+    if (_ordersCol == null) {
+      return Stream.value(null);
+    }
+    return _ordersCol!.doc(orderId).snapshots().map((doc) {
+      if (!doc.exists || doc.data() == null) return null;
+      return OrderModel.fromJson(doc.data()!, doc.id);
+    }).handleError((_) => null);
+  }
+
+  /// Cancel an order in Firestore
+  Future<void> cancelOrder(String orderId) async {
+    if (_ordersCol != null) {
+      await _ordersCol!.doc(orderId).update({
+        'status': OrderStatus.cancelled.name,
+      });
+    }
+  }
+
   // =========================================================================
   // 4. SAVED CUSTOM BUILDS (User's Cloud Profile)
   // =========================================================================
@@ -190,20 +181,17 @@ class FirestoreService {
   CollectionReference<Map<String, dynamic>>? _savedBuildsCol(String userId) =>
       _firestore?.collection('users').doc(userId).collection('saved_builds');
 
-  /// Stream user's cloud saved rigs
+  /// Stream user's cloud saved rigs purely from Cloud Firestore
   Stream<List<PcBuildModel>> streamSavedBuilds(String userId) {
     final col = _savedBuildsCol(userId);
     if (col == null) {
-      return Stream.value(AppData.savedBuilds);
+      return Stream.value([]);
     }
     return col.snapshots().map((snapshot) {
-      if (snapshot.docs.isEmpty) {
-        return AppData.savedBuilds;
-      }
       return snapshot.docs
           .map((doc) => PcBuildModel.fromJson(doc.data(), doc.id))
           .toList();
-    }).handleError((_) => AppData.savedBuilds);
+    }).handleError((_) => <PcBuildModel>[]);
   }
 
   /// Save a custom PC configuration to Firestore
@@ -295,14 +283,32 @@ class FirestoreService {
   }
 
   // =========================================================================
-  // 5. SEED CATALOG (Helper to populate Firestore for Admin Dashboard)
+  // 5. PROMOTIONAL HERO BANNERS
   // =========================================================================
 
-  /// Populate initial components and prebuilt rigs if collections are fresh
+  CollectionReference<Map<String, dynamic>>? get _bannersCol =>
+      _firestore?.collection('banners');
+
+  /// Stream promotional hero banners purely from Cloud Firestore
+  Stream<List<Map<String, dynamic>>> streamBanners() {
+    if (_bannersCol == null) {
+      return Stream.value([]);
+    }
+    return _bannersCol!.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+    }).handleError((_) => <Map<String, dynamic>>[]);
+  }
+
+  // =========================================================================
+  // 6. SEED CATALOG (Helper to populate Firestore for Admin Dashboard)
+  // =========================================================================
+
+  /// Populate initial components, prebuilt rigs, and banners if collections are fresh
   Future<void> seedDatabaseIfEmpty() async {
     final fs = _firestore;
     final compCol = _componentsCol;
     final pcCol = _prebuiltPcsCol;
+    final banCol = _bannersCol;
 
     if (fs == null || compCol == null || pcCol == null) {
       return;
@@ -326,6 +332,18 @@ class FirestoreService {
           batch.set(doc, pc.toFirestore());
         }
         await batch.commit();
+      }
+
+      if (banCol != null) {
+        final banSnapshot = await banCol.limit(1).get();
+        if (banSnapshot.docs.isEmpty) {
+          final batch = fs.batch();
+          for (var i = 0; i < AppData.heroBanners.length; i++) {
+            final doc = banCol.doc('banner_${i + 1}');
+            batch.set(doc, AppData.heroBanners[i]);
+          }
+          await batch.commit();
+        }
       }
     } catch (_) {}
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_data.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/live_badge.dart';
 import '../../models/custom_build_state.dart';
@@ -30,10 +29,11 @@ class _ComponentPickerSheetState extends State<ComponentPickerSheet> {
     return StreamBuilder<List<PcComponent>>(
       stream: FirestoreService().streamComponents(category: widget.category),
       builder: (context, snapshot) {
-        final categoryComponents = snapshot.data ??
-            AppData.allComponents
-                .where((c) => c.category == widget.category)
-                .toList();
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final categoryComponents = snapshot.data ?? [];
 
         // Get unique brands
         final brands = ['All', ...categoryComponents.map((c) => c.brand).toSet()];
@@ -194,7 +194,10 @@ class _ComponentPickerSheetState extends State<ComponentPickerSheet> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Row(
+                                        Wrap(
+                                          spacing: 6,
+                                          runSpacing: 2,
+                                          crossAxisAlignment: WrapCrossAlignment.center,
                                           children: [
                                             Text(
                                               item.brand,
@@ -204,14 +207,12 @@ class _ComponentPickerSheetState extends State<ComponentPickerSheet> {
                                                 color: AppColors.primary,
                                               ),
                                             ),
-                                            if (item.badge != null) ...[
-                                              const SizedBox(width: 6),
+                                            if (item.badge != null)
                                               LiveBadge(
                                                 text: item.badge!,
                                                 backgroundColor: AppColors.primarySurface,
                                                 textColor: AppColors.primaryDark,
                                               ),
-                                            ],
                                           ],
                                         ),
                                         const SizedBox(height: 4),
@@ -225,7 +226,7 @@ class _ComponentPickerSheetState extends State<ComponentPickerSheet> {
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
-                                          '\$${item.price.toStringAsFixed(2)}',
+                                          '৳${item.price.toStringAsFixed(0)}',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w800,

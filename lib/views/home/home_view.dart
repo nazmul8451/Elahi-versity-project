@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_data.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/live_badge.dart';
@@ -214,126 +213,150 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildHeroCarousel() {
-    return Column(
-      children: [
-        SizedBox(
-          height: 180,
-          child: PageView.builder(
-            itemCount: AppData.heroBanners.length,
-            onPageChanged: (index) {
-              setState(() => _activeHeroIndex = index);
-            },
-            itemBuilder: (context, index) {
-              final banner = AppData.heroBanners[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(18),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      AppNetworkImage(
-                        imageUrl: banner['imageUrl'] ?? '',
-                        fit: BoxFit.cover,
-                      ),
-                      // Dark Gradient Overlay
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withValues(alpha: 0.85),
-                              Colors.black.withValues(alpha: 0.3),
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                        ),
-                      ),
-                      // Content
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            LiveBadge(
-                              text: banner['badge'] ?? '',
-                              backgroundColor: AppColors.primary,
-                              textColor: Colors.white,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              banner['title'] ?? '',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              banner['subtitle'] ?? '',
-                              maxLines: 2,
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            GestureDetector(
-                              onTap: () {
-                                widget.onNavigateToTab(1); // Go to builder
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryAccent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      banner['cta'] ?? 'Explore',
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.black),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-            AppData.heroBanners.length,
-            (index) => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: _activeHeroIndex == index ? 16 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: _activeHeroIndex == index ? AppColors.primary : AppColors.border,
-                borderRadius: BorderRadius.circular(3),
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: FirestoreService().streamBanners(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 180,
+            child: Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
-          ),
-        ),
-      ],
+          );
+        }
+
+        final banners = snapshot.data ?? [];
+        if (banners.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          children: [
+            SizedBox(
+              height: 180,
+              child: PageView.builder(
+                itemCount: banners.length,
+                onPageChanged: (index) {
+                  setState(() => _activeHeroIndex = index);
+                },
+                itemBuilder: (context, index) {
+                  final banner = banners[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          AppNetworkImage(
+                            imageUrl: banner['imageUrl'] ?? '',
+                            fit: BoxFit.cover,
+                          ),
+                          // Dark Gradient Overlay
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.black.withValues(alpha: 0.85),
+                                  Colors.black.withValues(alpha: 0.3),
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                            ),
+                          ),
+                          // Content
+                          Padding(
+                            padding: const EdgeInsets.all(18.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (banner['badge'] != null && (banner['badge'] as String).isNotEmpty)
+                                  LiveBadge(
+                                    text: banner['badge'] ?? '',
+                                    backgroundColor: AppColors.primary,
+                                    textColor: Colors.white,
+                                  ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  banner['title'] ?? '',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  banner['subtitle'] ?? '',
+                                  maxLines: 2,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                GestureDetector(
+                                  onTap: () {
+                                    widget.onNavigateToTab(1); // Go to builder
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primaryAccent,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          banner['cta'] ?? 'Explore',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.black),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                banners.length,
+                (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: _activeHeroIndex == index ? 16 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _activeHeroIndex == index ? AppColors.primary : AppColors.border,
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -484,9 +507,14 @@ class _HomeViewState extends State<HomeView> {
           child: StreamBuilder<List<PcBuildModel>>(
             stream: FirestoreService().streamPrebuiltPcs(),
             builder: (context, snapshot) {
-              final prebuilts = snapshot.data ?? AppData.featuredPrebuilts;
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              final prebuilts = snapshot.data ?? [];
               if (prebuilts.isEmpty) {
-                return const Center(child: Text('No pre-built systems found'));
+                return const Center(child: Text('No pre-built systems found in database'));
               }
               return ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -580,15 +608,21 @@ class _HomeViewState extends State<HomeView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        pc.tier,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
+                      Expanded(
+                        child: Text(
+                          pc.tier,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 4),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
                           const SizedBox(width: 2),
@@ -645,7 +679,7 @@ class _HomeViewState extends State<HomeView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '\$${pc.price.toStringAsFixed(0)}',
+                            '৳${pc.price.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
@@ -654,7 +688,7 @@ class _HomeViewState extends State<HomeView> {
                           ),
                           if (pc.originalPrice != null)
                             Text(
-                              '\$${pc.originalPrice!.toStringAsFixed(0)}',
+                              '৳${pc.originalPrice!.toStringAsFixed(0)}',
                               style: const TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textLight,
@@ -705,7 +739,23 @@ class _HomeViewState extends State<HomeView> {
         StreamBuilder<List<PcComponent>>(
           stream: FirestoreService().streamComponents(),
           builder: (context, snapshot) {
-            final list = (snapshot.data ?? AppData.allComponents).take(4).toList();
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            final list = (snapshot.data ?? []).take(4).toList();
+            if (list.isEmpty) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('No hardware components found in database'),
+                ),
+              );
+            }
             return ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               shrinkWrap: true,
@@ -735,7 +785,10 @@ class _HomeViewState extends State<HomeView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              spacing: 6,
+                              runSpacing: 2,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
                                   comp.category.displayName,
@@ -745,10 +798,12 @@ class _HomeViewState extends State<HomeView> {
                                     color: AppColors.primary,
                                   ),
                                 ),
-                                if (comp.badge != null) ...[
-                                  const SizedBox(width: 6),
-                                  LiveBadge(text: comp.badge!),
-                                ],
+                                if (comp.badge != null)
+                                  LiveBadge(
+                                    text: comp.badge!,
+                                    backgroundColor: AppColors.primarySurface,
+                                    textColor: AppColors.primaryDark,
+                                  ),
                               ],
                             ),
                             const SizedBox(height: 2),
@@ -777,7 +832,7 @@ class _HomeViewState extends State<HomeView> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            '\$${comp.price.toStringAsFixed(2)}',
+                            '৳${comp.price.toStringAsFixed(0)}',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,

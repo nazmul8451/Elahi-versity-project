@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_data.dart';
 import '../../models/order_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
@@ -38,9 +37,22 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
     return StreamBuilder<List<OrderModel>>(
       stream: FirestoreService().streamUserOrders(userId),
       builder: (context, snapshot) {
-        final allOrders = snapshot.data ?? AppData.mockOrders;
-        final activeOrders = allOrders.where((o) => o.status != OrderStatus.delivered).toList();
-        final completedOrders = allOrders.where((o) => o.status == OrderStatus.delivered).toList();
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: AppColors.background,
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final allOrders = snapshot.data ?? [];
+        final activeOrders = allOrders
+            .where((o) => o.status != OrderStatus.delivered && o.status != OrderStatus.cancelled)
+            .toList();
+        final completedOrders = allOrders
+            .where((o) => o.status == OrderStatus.delivered || o.status == OrderStatus.cancelled)
+            .toList();
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -134,6 +146,17 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
 
   Widget _buildOrderCard(OrderModel order) {
     final isDelivered = order.status == OrderStatus.delivered;
+    final isCancelled = order.status == OrderStatus.cancelled;
+
+    Color statusBg = AppColors.primarySurface;
+    Color statusColor = AppColors.primary;
+    if (isDelivered) {
+      statusBg = AppColors.success.withValues(alpha: 0.15);
+      statusColor = AppColors.success;
+    } else if (isCancelled) {
+      statusBg = AppColors.error.withValues(alpha: 0.15);
+      statusColor = AppColors.error;
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -160,26 +183,31 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.memory_rounded, color: AppColors.primary, size: 20),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Order #${order.id}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: AppColors.textPrimary,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(Icons.memory_rounded, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Order #${order.id}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: isDelivered
-                            ? AppColors.success.withValues(alpha: 0.15)
-                            : AppColors.primarySurface,
+                        color: statusBg,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -187,7 +215,7 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
-                          color: isDelivered ? AppColors.success : AppColors.primary,
+                          color: statusColor,
                         ),
                       ),
                     ),
@@ -213,7 +241,7 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                 const SizedBox(height: 12),
 
                 // Order Tracking Stepper Mini
-                if (!isDelivered) ...[
+                if (!isDelivered && !isCancelled) ...[
                   Row(
                     children: [
                       const Icon(Icons.autorenew_rounded, size: 16, color: AppColors.primary),
@@ -232,7 +260,7 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: (order.status.stepIndex + 1) / OrderStatus.values.length,
+                      value: (order.status.stepIndex + 1) / (OrderStatus.values.length - 1),
                       backgroundColor: AppColors.inputBg,
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
                       minHeight: 6,
@@ -256,7 +284,7 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                   children: [
                     const Text('Total Amount', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
                     Text(
-                      '\$${order.totalAmount.toStringAsFixed(2)}',
+                      '৳${order.totalAmount.toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,

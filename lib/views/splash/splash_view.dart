@@ -4,7 +4,6 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
-import '../../services/firestore_service.dart';
 import '../auth/login_view.dart';
 import '../main_nav_view.dart';
 
@@ -44,11 +43,8 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   }
 
   Future<void> _checkAuthAndNavigate() async {
-    // Seed initial catalog in background if Firestore is empty
-    FirestoreService().seedDatabaseIfEmpty().catchError((_) {});
-
     // Animate status text
-    await Future.delayed(const Duration(milliseconds: 1000));
+    await Future.delayed(const Duration(milliseconds: 600));
     if (mounted) {
       setState(() => _statusText = 'Connecting to Hardware Cloud...');
     }

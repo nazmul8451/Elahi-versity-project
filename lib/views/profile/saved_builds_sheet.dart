@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_data.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/pc_build_model.dart';
@@ -69,7 +68,11 @@ class SavedBuildsSheet extends StatelessWidget {
             child: StreamBuilder<List<PcBuildModel>>(
               stream: FirestoreService().streamSavedBuilds(userId),
               builder: (context, snapshot) {
-                final builds = snapshot.data ?? AppData.savedBuilds;
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                final builds = snapshot.data ?? [];
 
                 if (builds.isEmpty) {
                   return const Center(
@@ -137,6 +140,8 @@ class SavedBuildsSheet extends StatelessWidget {
                   children: [
                     Text(
                       build.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -150,7 +155,7 @@ class SavedBuildsSheet extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$${build.price.toStringAsFixed(2)}',
+                      '৳${build.price.toStringAsFixed(0)}',
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
