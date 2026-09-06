@@ -18,7 +18,7 @@ class AppStrings {
 
   // Builder Strings
   static const String builderTitle = 'Custom PC Builder';
-  static const String builderSubtitle = 'Select your components to craft your ultimate rig';
+  static const String builderSubtitle = 'Select your components to craft your ultimate PC';
   static const String totalEstimated = 'Total Price';
   static const String estimatedWattage = 'Est. Wattage';
   static const String compatibilityStatus = 'Compatibility Check';
@@ -26,7 +26,7 @@ class AppStrings {
   static const String incompatibleWarning = 'Potential Incompatibility';
   static const String saveBuild = 'Save Build';
   static const String resetBuild = 'Reset';
-  static const String orderBuild = 'Order Custom Rig';
+  static const String orderBuild = 'Order Custom PC';
   static const String selectComponent = 'Choose';
   static const String changeComponent = 'Change';
   static const String removeComponent = 'Remove';
@@ -35,7 +35,7 @@ class AppStrings {
   static const String ordersTitle = 'My Orders';
   static const String activeOrders = 'Active';
   static const String completedOrders = 'Completed';
-  static const String customBuilds = 'Custom Rigs';
+  static const String customBuilds = 'Custom PCs';
 
   // Auth Strings
   static const String loginTitle = 'Welcome Back';

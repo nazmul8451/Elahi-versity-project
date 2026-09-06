@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
 import '../models/custom_build_state.dart';
@@ -77,7 +78,7 @@ class _MainNavViewState extends State<MainNavView> {
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.06),
-                blurRadius: 16,
+                blurRadius: 16.r,
                 offset: const Offset(0, -4),
               ),
             ],
@@ -89,8 +90,9 @@ class _MainNavViewState extends State<MainNavView> {
             backgroundColor: Colors.white,
             selectedItemColor: AppColors.primary,
             unselectedItemColor: AppColors.textLight,
-            selectedFontSize: 12,
-            unselectedFontSize: 12,
+            selectedFontSize: 11.sp,
+            unselectedFontSize: 11.sp,
+            iconSize: 22.r,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
             items: [
               const BottomNavigationBarItem(
@@ -105,7 +107,7 @@ class _MainNavViewState extends State<MainNavView> {
                     final count = _customBuildState.selectedCount;
                     return Badge(
                       isLabelVisible: count > 0,
-                      label: Text('$count'),
+                      label: Text('$count', style: TextStyle(fontSize: 10.sp)),
                       backgroundColor: AppColors.primary,
                       child: const Icon(Icons.build_circle_outlined),
                     );
@@ -117,7 +119,7 @@ class _MainNavViewState extends State<MainNavView> {
                     final count = _customBuildState.selectedCount;
                     return Badge(
                       isLabelVisible: count > 0,
-                      label: Text('$count'),
+                      label: Text('$count', style: TextStyle(fontSize: 10.sp)),
                       backgroundColor: AppColors.primaryDark,
                       child: const Icon(Icons.build_circle_rounded),
                     );

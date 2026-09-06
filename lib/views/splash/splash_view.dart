@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
 import '../auth/login_view.dart';
 import '../main_nav_view.dart';
 
@@ -43,6 +45,9 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   }
 
   Future<void> _checkAuthAndNavigate() async {
+    // Asynchronously seed database without blocking UI
+    unawaited(FirestoreService().seedDatabaseIfEmpty());
+
     // Animate status text
     await Future.delayed(const Duration(milliseconds: 600));
     if (mounted) {
@@ -86,11 +91,11 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
         children: [
           // Background Tech Glows
           Positioned(
-            top: -100,
-            left: -100,
+            top: -100.h,
+            left: -100.w,
             child: Container(
-              width: 300,
-              height: 300,
+              width: 300.r,
+              height: 300.r,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primary.withValues(alpha: 0.25),
@@ -98,11 +103,11 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
             ),
           ),
           Positioned(
-            bottom: -80,
-            right: -80,
+            bottom: -80.h,
+            right: -80.w,
             child: Container(
-              width: 260,
-              height: 260,
+              width: 260.r,
+              height: 260.r,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primaryAccent.withValues(alpha: 0.2),
@@ -121,50 +126,50 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                   children: [
                     // Glowing Icon Container
                     Container(
-                      width: 96,
-                      height: 96,
+                      width: 96.r,
+                      height: 96.r,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [AppColors.primary, AppColors.primaryAccent],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(28),
+                        borderRadius: BorderRadius.circular(28.r),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primaryAccent.withValues(alpha: 0.45),
-                            blurRadius: 30,
+                            blurRadius: 30.r,
                             offset: const Offset(0, 10),
                           ),
                         ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           Icons.memory_rounded,
-                          size: 52,
+                          size: 52.r,
                           color: Colors.white,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    SizedBox(height: 28.h),
 
                     // App Name
-                    const Text(
+                    Text(
                       AppStrings.appName,
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 30.sp,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
                         letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
 
                     // Tagline
                     Text(
                       AppStrings.appTagline,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.w500,
                         color: Colors.white.withValues(alpha: 0.7),
                         letterSpacing: 0.5,
@@ -178,24 +183,24 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
 
           // Bottom Loading & Status
           Positioned(
-            bottom: 48,
-            left: 24,
-            right: 24,
+            bottom: 48.h,
+            left: 24.w,
+            right: 24.w,
             child: Column(
               children: [
-                const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
+                SizedBox(
+                  width: 24.r,
+                  height: 24.r,
+                  child: const CircularProgressIndicator(
                     strokeWidth: 2.5,
                     valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryAccent),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Text(
                   _statusText,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 12.sp,
                     color: Colors.white.withValues(alpha: 0.6),
                     fontWeight: FontWeight.w500,
                   ),

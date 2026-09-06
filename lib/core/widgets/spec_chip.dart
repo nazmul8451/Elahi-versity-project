@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/app_colors.dart';
 
 class SpecChip extends StatelessWidget {
@@ -20,10 +21,10 @@ class SpecChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: backgroundColor ?? AppColors.inputBg,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(10.r),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
       ),
       child: Row(
@@ -31,17 +32,17 @@ class SpecChip extends StatelessWidget {
         children: [
           Icon(
             icon,
-            size: 14,
+            size: 13.sp,
             color: iconColor ?? AppColors.primary,
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: 6.w),
           Flexible(
             child: Text(
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
                 color: textColor ?? AppColors.textPrimary,
               ),

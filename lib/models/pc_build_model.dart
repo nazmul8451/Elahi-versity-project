@@ -74,7 +74,7 @@ class PcBuildModel {
     return PcBuildModel(
       id: docId ?? (json['id']?.toString() ?? ''),
       title: json['title']?.toString() ?? '',
-      tier: json['tier']?.toString() ?? 'Custom Rig',
+      tier: json['tier']?.toString() ?? 'Custom PC',
       price: (json['price'] is num)
           ? (json['price'] as num).toDouble()
           : double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,

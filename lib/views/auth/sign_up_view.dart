@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/widgets/custom_button.dart';
@@ -98,7 +99,7 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20.r),
           onPressed: () {
             if (Navigator.canPop(context)) {
               Navigator.pop(context);
@@ -114,7 +115,7 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
             child: Form(
               key: _formKey,
               child: Column(
@@ -123,62 +124,63 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                   // App Icon / Logo
                   Center(
                     child: Container(
-                      width: 72,
-                      height: 72,
+                      width: 72.r,
+                      height: 72.r,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [AppColors.primary, AppColors.primaryLight],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 16,
+                            blurRadius: 16.r,
                             offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.person_add_alt_1_rounded,
                         color: Colors.white,
-                        size: 36,
+                        size: 36.r,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 20.h),
 
                   // Header Titles
                   Text(
                     AppStrings.signUpTitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 26,
+                    style: TextStyle(
+                      fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6.h),
                   Text(
                     AppStrings.signUpSubtitle,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 13.sp,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 24.h),
 
                   // Full Name Field
                   TextFormField(
                     controller: _nameController,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(
+                    style: TextStyle(fontSize: 14.sp),
+                    decoration: InputDecoration(
                       labelText: AppStrings.fullName,
                       hintText: AppStrings.fullNameHint,
-                      prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.primary),
+                      prefixIcon: Icon(Icons.person_outline_rounded, color: AppColors.primary, size: 20.r),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -187,17 +189,18 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 14.h),
 
                   // Email Field
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(
+                    style: TextStyle(fontSize: 14.sp),
+                    decoration: InputDecoration(
                       labelText: AppStrings.email,
                       hintText: AppStrings.emailHint,
-                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppColors.primary),
+                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppColors.primary, size: 20.r),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -209,21 +212,23 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 14.h),
 
                   // Password Field
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _isPasswordObscured,
                     textInputAction: TextInputAction.next,
+                    style: TextStyle(fontSize: 14.sp),
                     decoration: InputDecoration(
                       labelText: AppStrings.password,
                       hintText: AppStrings.passwordHint,
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                      prefixIcon: Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 20.r),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: AppColors.textSecondary,
+                          size: 20.r,
                         ),
                         onPressed: () {
                           setState(() => _isPasswordObscured = !_isPasswordObscured);
@@ -240,7 +245,7 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 14.h),
 
                   // Confirm Password Field
                   TextFormField(
@@ -248,14 +253,16 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                     obscureText: _isConfirmPasswordObscured,
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _handleSignUp(),
+                    style: TextStyle(fontSize: 14.sp),
                     decoration: InputDecoration(
                       labelText: AppStrings.confirmPassword,
                       hintText: AppStrings.confirmPasswordHint,
-                      prefixIcon: const Icon(Icons.lock_reset_rounded, color: AppColors.primary),
+                      prefixIcon: Icon(Icons.lock_reset_rounded, color: AppColors.primary, size: 20.r),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isConfirmPasswordObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: AppColors.textSecondary,
+                          size: 20.r,
                         ),
                         onPressed: () {
                           setState(() => _isConfirmPasswordObscured = !_isConfirmPasswordObscured);
@@ -272,36 +279,36 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 12.h),
 
                   // Terms & Conditions Checkbox
                   Row(
                     children: [
                       SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: 24.r,
+                        width: 24.r,
                         child: Checkbox(
                           value: _agreedToTerms,
                           activeColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
                           onChanged: (val) {
                             setState(() => _agreedToTerms = val ?? false);
                           },
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      const Expanded(
+                      SizedBox(width: 10.w),
+                      Expanded(
                         child: Text(
                           AppStrings.agreeTerms,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12.sp,
                             color: AppColors.textSecondary,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 20.h),
 
                   // Global Custom Button for Sign Up
                   CustomButton(
@@ -309,15 +316,15 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                     isLoading: _isLoading,
                     onPressed: _handleSignUp,
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 20.h),
 
                   // Already have an account? Sign In
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         AppStrings.alreadyHaveAccount,
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
                       ),
                       TextButton(
                         onPressed: () {
@@ -330,12 +337,12 @@ class _SignUpViewState extends State<SignUpView> implements SignUpViewContract {
                             );
                           }
                         },
-                        child: const Text(
+                        child: Text(
                           AppStrings.signInNow,
                           style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 13.sp,
                           ),
                         ),
                       ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/widgets/custom_button.dart';
@@ -82,7 +83,7 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
 
   void _fillDemoAccount() {
     setState(() {
-      _emailController.text = 'builder@rigcraft.com';
+      _emailController.text = 'builder@pcbuilder.com';
       _passwordController.text = '123456';
     });
     ScaffoldMessenger.of(context).showSnackBar(
@@ -101,7 +102,7 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
             child: Form(
               key: _formKey,
               child: Column(
@@ -110,62 +111,63 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                   // App Icon / Logo
                   Center(
                     child: Container(
-                      width: 80,
-                      height: 80,
+                      width: 80.r,
+                      height: 80.r,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [AppColors.primary, AppColors.primaryAccent],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(24.r),
                         boxShadow: [
                           BoxShadow(
                             color: AppColors.primary.withValues(alpha: 0.35),
-                            blurRadius: 20,
+                            blurRadius: 20.r,
                             offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.memory_rounded,
                         color: Colors.white,
-                        size: 44,
+                        size: 44.r,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
 
                   // Header Titles
-                  const Text(
+                  Text(
                     AppStrings.loginTitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
+                  SizedBox(height: 6.h),
+                  Text(
                     AppStrings.loginSubtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 13.sp,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 28.h),
 
                   // Email Field
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.next,
-                    decoration: const InputDecoration(
+                    style: TextStyle(fontSize: 14.sp),
+                    decoration: InputDecoration(
                       labelText: AppStrings.email,
                       hintText: AppStrings.emailHint,
-                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppColors.primary),
+                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppColors.primary, size: 20.r),
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -178,7 +180,7 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   // Password Field
                   TextFormField(
@@ -186,14 +188,16 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                     obscureText: _isPasswordObscured,
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _handleLogin(),
+                    style: TextStyle(fontSize: 14.sp),
                     decoration: InputDecoration(
                       labelText: AppStrings.password,
                       hintText: AppStrings.passwordHint,
-                      prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.primary),
+                      prefixIcon: Icon(Icons.lock_outline_rounded, color: AppColors.primary, size: 20.r),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _isPasswordObscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: AppColors.textSecondary,
+                          size: 20.r,
                         ),
                         onPressed: () {
                           setState(() => _isPasswordObscured = !_isPasswordObscured);
@@ -210,7 +214,7 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
 
                   // Remember Me & Forgot Password Row
                   Row(
@@ -219,21 +223,21 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                       Row(
                         children: [
                           SizedBox(
-                            height: 24,
-                            width: 24,
+                            height: 24.r,
+                            width: 24.r,
                             child: Checkbox(
                               value: _rememberMe,
                               activeColor: AppColors.primary,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
                               onChanged: (val) {
                                 setState(() => _rememberMe = val ?? false);
                               },
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
+                          SizedBox(width: 8.w),
+                          Text(
                             'Remember me',
-                            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                            style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
                           ),
                         ],
                       ),
@@ -243,10 +247,10 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                             const SnackBar(content: Text('Password reset link sent to your email!')),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           AppStrings.forgotPassword,
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12.sp,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
                           ),
@@ -254,25 +258,25 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
 
                   // Demo Credentials Quick Fill Chip
                   Center(
                     child: TextButton.icon(
                       onPressed: _fillDemoAccount,
-                      icon: const Icon(Icons.bolt_rounded, size: 16, color: AppColors.primary),
-                      label: const Text(
+                      icon: Icon(Icons.bolt_rounded, size: 16.r, color: AppColors.primary),
+                      label: Text(
                         'Autofill Demo Account',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+                        style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600, color: AppColors.primary),
                       ),
                       style: TextButton.styleFrom(
                         backgroundColor: AppColors.primarySurface,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 20.h),
 
                   // Login Button
                   CustomButton(
@@ -280,18 +284,18 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                     isLoading: _isLoading,
                     onPressed: _handleLogin,
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 20.h),
 
                   // Or Divider
                   Row(
                     children: [
                       const Expanded(child: Divider(color: AppColors.border, thickness: 1)),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
                         child: Text(
                           'OR',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             fontWeight: FontWeight.w600,
                             color: Colors.grey[500],
                           ),
@@ -300,7 +304,7 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                       const Expanded(child: Divider(color: AppColors.border, thickness: 1)),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 16.h),
 
                   // Social Login Buttons
                   Row(
@@ -308,30 +312,30 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                     children: [
                       _socialButton(
                         icon: Icons.g_mobiledata_rounded,
-                        iconSize: 34,
+                        iconSize: 34.r,
                         onTap: () {
-                          _presenter.login('builder@rigcraft.com', '123456');
+                          _presenter.login('builder@pcbuilder.com', '123456');
                         },
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16.w),
                       _socialButton(
                         icon: Icons.apple_rounded,
-                        iconSize: 26,
+                        iconSize: 26.r,
                         onTap: () {
-                          _presenter.login('builder@rigcraft.com', '123456');
+                          _presenter.login('builder@pcbuilder.com', '123456');
                         },
                       ),
                     ],
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 24.h),
 
                   // Don't have an account? Sign Up
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         AppStrings.dontHaveAccount,
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 13.sp),
                       ),
                       TextButton(
                         onPressed: () {
@@ -340,12 +344,12 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
                             MaterialPageRoute(builder: (context) => const SignUpView()),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           AppStrings.signUpNow,
                           style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 13.sp,
                           ),
                         ),
                       ),
@@ -363,18 +367,18 @@ class _LoginViewState extends State<LoginView> implements LoginViewContract {
   Widget _socialButton({required IconData icon, required double iconSize, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
-        width: 54,
-        height: 54,
+        width: 54.r,
+        height: 54.r,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 6,
+              blurRadius: 6.r,
               offset: const Offset(0, 2),
             ),
           ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_data.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../models/custom_build_state.dart';
 import '../../models/pc_build_model.dart';
@@ -23,40 +25,40 @@ class SavedBuildsSheet extends StatelessWidget {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       child: Column(
         children: [
           // Drag Handle
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Container(
-            width: 40,
-            height: 4,
+            width: 40.w,
+            height: 4.h,
             decoration: BoxDecoration(
               color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(2.r),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'My Saved Custom Rigs',
+                Text(
+                  'My Saved Custom PCs',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 17.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                  icon: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 22.sp),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -67,28 +69,28 @@ class SavedBuildsSheet extends StatelessWidget {
           Expanded(
             child: StreamBuilder<List<PcBuildModel>>(
               stream: FirestoreService().streamSavedBuilds(userId),
+              initialData: AppData.savedBuilds,
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                final builds = snapshot.data ?? [];
+                final rawBuilds = snapshot.data;
+                final builds = (rawBuilds != null && rawBuilds.isNotEmpty)
+                    ? rawBuilds
+                    : AppData.savedBuilds;
 
                 if (builds.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.bookmark_border_rounded, size: 48, color: AppColors.textLight),
-                        SizedBox(height: 12),
+                        Icon(Icons.bookmark_border_rounded, size: 44.sp, color: AppColors.textLight),
+                        SizedBox(height: 12.h),
                         Text(
-                          'No saved rigs found',
-                          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold),
+                          'No saved PCs found',
+                          style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold, fontSize: 14.sp),
                         ),
-                        SizedBox(height: 4),
+                        SizedBox(height: 4.h),
                         Text(
-                          'Use the "Save Rig" button in Builder to save configurations here.',
-                          style: TextStyle(fontSize: 12, color: AppColors.textLight),
+                          'Use the "Save PC" button in Builder to save configurations here.',
+                          style: TextStyle(fontSize: 11.sp, color: AppColors.textLight),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -97,9 +99,9 @@ class SavedBuildsSheet extends StatelessWidget {
                 }
 
                 return ListView.separated(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(16.r),
                   itemCount: builds.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 14),
+                  separatorBuilder: (context, index) => SizedBox(height: 14.h),
                   itemBuilder: (context, idx) {
                     final build = builds[idx];
                     return _buildSavedCard(context, build, userId);
@@ -115,10 +117,10 @@ class SavedBuildsSheet extends StatelessWidget {
 
   Widget _buildSavedCard(BuildContext context, PcBuildModel build, String userId) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14.r),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -128,12 +130,12 @@ class SavedBuildsSheet extends StatelessWidget {
             children: [
               AppNetworkImage(
                 imageUrl: build.imageUrl,
-                width: 64,
-                height: 64,
-                borderRadius: BorderRadius.circular(10),
+                width: 60.w,
+                height: 60.w,
+                borderRadius: BorderRadius.circular(10.r),
                 fallbackIcon: Icons.computer_rounded,
               ),
-              const SizedBox(width: 14),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,22 +144,22 @@ class SavedBuildsSheet extends StatelessWidget {
                       build.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 15,
+                      style: TextStyle(
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                         color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2.h),
                     Text(
                       '${build.gpu.split(' ').take(3).join(' ')} • ${build.cpu.split(' ').take(3).join(' ')}',
-                      style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                      style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       '৳${build.price.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        fontSize: 15,
+                      style: TextStyle(
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primary,
                       ),
@@ -166,14 +168,14 @@ class SavedBuildsSheet extends StatelessWidget {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: AppColors.textLight, size: 20),
-                tooltip: 'Delete Saved Rig',
+                icon: Icon(Icons.delete_outline_rounded, color: AppColors.textLight, size: 20.sp),
+                tooltip: 'Delete Saved PC',
                 onPressed: () async {
                   await FirestoreService().deleteSavedBuild(userId, build.id);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Saved rig removed.'),
+                        content: Text('Saved PC removed.'),
                         duration: Duration(seconds: 2),
                       ),
                     );
@@ -182,7 +184,7 @@ class SavedBuildsSheet extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
@@ -202,14 +204,14 @@ class SavedBuildsSheet extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.build_circle_outlined, size: 18),
-              label: const Text('Load into PC Builder'),
+              icon: Icon(Icons.build_circle_outlined, size: 18.sp),
+              label: Text('Load into PC Builder', style: TextStyle(fontSize: 12.sp)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primarySurface,
                 foregroundColor: AppColors.primary,
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(vertical: 10.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
               ),
             ),
           ),

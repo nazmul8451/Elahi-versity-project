@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/live_badge.dart';
@@ -27,29 +28,29 @@ class PcDetailsView extends StatelessWidget {
         slivers: [
           // Hero Image Sliver AppBar
           SliverAppBar(
-            expandedHeight: 280,
+            expandedHeight: 270.h,
             pinned: true,
             backgroundColor: AppColors.darkCard,
             leading: IconButton(
               icon: Container(
-                padding: const EdgeInsets.all(8),
+                padding: EdgeInsets.all(8.r),
                 decoration: BoxDecoration(
                   color: Colors.black.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 16.sp),
               ),
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
               IconButton(
                 icon: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.favorite_border_rounded, color: Colors.white, size: 20),
+                  child: Icon(Icons.favorite_border_rounded, color: Colors.white, size: 18.sp),
                 ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -59,12 +60,12 @@ class PcDetailsView extends StatelessWidget {
               ),
               IconButton(
                 icon: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8.r),
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.5),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.share_rounded, color: Colors.white, size: 20),
+                  child: Icon(Icons.share_rounded, color: Colors.white, size: 18.sp),
                 ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -72,7 +73,7 @@ class PcDetailsView extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8.w),
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
@@ -98,9 +99,9 @@ class PcDetailsView extends StatelessWidget {
                   ),
                   // Bottom Info inside Hero
                   Positioned(
-                    bottom: 16,
-                    left: 20,
-                    right: 20,
+                    bottom: 16.h,
+                    left: 20.w,
+                    right: 20.w,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -112,31 +113,31 @@ class PcDetailsView extends StatelessWidget {
                                 backgroundColor: AppColors.accentAmber,
                                 textColor: Colors.black,
                               ),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8.w),
                             ],
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(6.r),
                               ),
                               child: Text(
                                 pc.tier,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 11,
+                                  fontSize: 11.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         Text(
                           pc.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 20.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -151,21 +152,21 @@ class PcDetailsView extends StatelessWidget {
           // Content Body
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(16.r),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Price & Rating Card
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
+                          blurRadius: 10.r,
                           offset: const Offset(0, 4),
                         ),
                       ],
@@ -180,18 +181,18 @@ class PcDetailsView extends StatelessWidget {
                               children: [
                                 Text(
                                   '৳${pc.price.toStringAsFixed(0)}',
-                                  style: const TextStyle(
-                                    fontSize: 26,
+                                  style: TextStyle(
+                                    fontSize: 22.sp,
                                     fontWeight: FontWeight.w800,
                                     color: AppColors.primary,
                                   ),
                                 ),
                                 if (pc.originalPrice != null) ...[
-                                  const SizedBox(width: 8),
+                                  SizedBox(width: 8.w),
                                   Text(
                                     '৳${pc.originalPrice!.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                    style: TextStyle(
+                                      fontSize: 14.sp,
                                       color: AppColors.textLight,
                                       decoration: TextDecoration.lineThrough,
                                     ),
@@ -199,16 +200,16 @@ class PcDetailsView extends StatelessWidget {
                                 ],
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4.h),
                             Row(
                               children: [
-                                const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 14),
-                                const SizedBox(width: 4),
-                                const Text(
+                                Icon(Icons.check_circle_rounded, color: AppColors.success, size: 14.sp),
+                                SizedBox(width: 4.w),
+                                Text(
                                   'In Stock • Ready to Ship',
                                   style: TextStyle(
                                     color: AppColors.success,
-                                    fontSize: 12,
+                                    fontSize: 11.sp,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -218,22 +219,22 @@ class PcDetailsView extends StatelessWidget {
                         ),
                         // Rating box
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
                           decoration: BoxDecoration(
                             color: AppColors.primarySurface,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: Column(
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
-                                  const SizedBox(width: 4),
+                                  Icon(Icons.star_rounded, color: Colors.amber, size: 16.sp),
+                                  SizedBox(width: 4.w),
                                   Text(
                                     '${pc.rating}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                      fontSize: 13.sp,
                                       color: AppColors.textPrimary,
                                     ),
                                   ),
@@ -241,7 +242,7 @@ class PcDetailsView extends StatelessWidget {
                               ),
                               Text(
                                 '${pc.reviews} reviews',
-                                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary),
                               ),
                             ],
                           ),
@@ -249,44 +250,44 @@ class PcDetailsView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
 
                   // Overview / Description
-                  const Text(
+                  Text(
                     'Build Overview',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   Text(
                     pc.description,
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: 13.sp,
                       height: 1.5,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   // Highlight Tags
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: 8.w,
+                    runSpacing: 8.h,
                     children: pc.tags.map((tag) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
                         decoration: BoxDecoration(
                           color: AppColors.inputBg,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(8.r),
                           border: Border.all(color: AppColors.border),
                         ),
                         child: Text(
                           tag,
-                          style: const TextStyle(
-                            fontSize: 12,
+                          style: TextStyle(
+                            fontSize: 11.sp,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
                           ),
@@ -294,22 +295,22 @@ class PcDetailsView extends StatelessWidget {
                       );
                     }).toList(),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // Full Hardware Specs Breakdown
-                  const Text(
+                  Text(
                     'Hardware Specifications',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
@@ -332,22 +333,22 @@ class PcDetailsView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // Customization Callout Card
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16.r),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [AppColors.primaryDark, AppColors.primary],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 12,
+                          blurRadius: 12.r,
                           offset: const Offset(0, 4),
                         ),
                       ],
@@ -355,32 +356,32 @@ class PcDetailsView extends StatelessWidget {
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: EdgeInsets.all(10.r),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.tune_rounded, color: Colors.white, size: 24),
+                          child: Icon(Icons.tune_rounded, color: Colors.white, size: 22.sp),
                         ),
-                        const SizedBox(width: 14),
+                        SizedBox(width: 14.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: const [
+                            children: [
                               Text(
                                 'Want to tweak this build?',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 15,
+                                  fontSize: 14.sp,
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              SizedBox(height: 2.h),
                               Text(
                                 'Open it in PC Builder to swap CPU, GPU, or RAM.',
                                 style: TextStyle(
                                   color: Colors.white70,
-                                  fontSize: 12,
+                                  fontSize: 11.sp,
                                 ),
                               ),
                             ],
@@ -389,7 +390,7 @@ class PcDetailsView extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 100), // Spacing for bottom bar
+                  SizedBox(height: 90.h), // Spacing for bottom bar
                 ],
               ),
             ),
@@ -399,13 +400,13 @@ class PcDetailsView extends StatelessWidget {
 
       // Bottom Fixed Actions
       bottomSheet: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 10,
+              blurRadius: 10.r,
               offset: const Offset(0, -4),
             ),
           ],
@@ -434,18 +435,18 @@ class PcDetailsView extends StatelessWidget {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.build_circle_outlined, size: 18, color: AppColors.primary),
-                  label: const Text('Customize', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                  icon: Icon(Icons.build_circle_outlined, size: 16.sp, color: AppColors.primary),
+                  label: Text('Customize', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12.sp)),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.primary, width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 10.w),
 
-              // Buy / Order Rig Button
+              // Buy / Order PC Button
               Expanded(
                 flex: 2,
                 child: ElevatedButton.icon(
@@ -470,13 +471,13 @@ class PcDetailsView extends StatelessWidget {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.shopping_cart_checkout_rounded, size: 18),
-                  label: Text('Buy Now • ৳${pc.price.toInt()}'),
+                  icon: Icon(Icons.shopping_cart_checkout_rounded, size: 16.sp),
+                  label: Text('Buy Now • ৳${pc.price.toInt()}', style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                 ),
               ),
@@ -489,18 +490,18 @@ class PcDetailsView extends StatelessWidget {
 
   Widget _specRow(IconData icon, String title, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.primary),
-          const SizedBox(width: 12),
+          Icon(icon, size: 16.sp, color: AppColors.primary),
+          SizedBox(width: 10.w),
           SizedBox(
-            width: 110,
+            width: 105.w,
             child: Text(
               title,
-              style: const TextStyle(
-                fontSize: 13,
+              style: TextStyle(
+                fontSize: 12.sp,
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
@@ -509,8 +510,8 @@ class PcDetailsView extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 13,
+              style: TextStyle(
+                fontSize: 12.sp,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),

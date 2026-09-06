@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/app_colors.dart';
 
 class LiveBadge extends StatelessWidget {
@@ -63,22 +64,22 @@ class LiveBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(6.r),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[
-            Icon(icon, size: 11, color: textColor),
-            const SizedBox(width: 4),
+            Icon(icon, size: 11.sp, color: textColor),
+            SizedBox(width: 4.w),
           ],
           Text(
             text,
             style: TextStyle(
-              fontSize: 10,
+              fontSize: 10.sp,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.3,
               color: textColor,

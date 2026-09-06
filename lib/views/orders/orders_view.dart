@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_data.dart';
 import '../../models/order_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/firestore_service.dart';
@@ -36,17 +38,12 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
 
     return StreamBuilder<List<OrderModel>>(
       stream: FirestoreService().streamUserOrders(userId),
+      initialData: AppData.mockOrders,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            backgroundColor: AppColors.background,
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
-        final allOrders = snapshot.data ?? [];
+        final rawOrders = snapshot.data;
+        final allOrders = (rawOrders != null && rawOrders.isNotEmpty)
+            ? rawOrders
+            : AppData.mockOrders;
         final activeOrders = allOrders
             .where((o) => o.status != OrderStatus.delivered && o.status != OrderStatus.cancelled)
             .toList();
@@ -59,10 +56,10 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
-            title: const Text(
-              'My Rig Orders',
+            title: Text(
+              'My PC Orders',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
               ),
@@ -73,7 +70,7 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
               unselectedLabelColor: AppColors.textSecondary,
               indicatorColor: AppColors.primary,
               indicatorWeight: 3,
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.sp),
               tabs: [
                 Tab(text: 'Active Builds (${activeOrders.length})'),
                 Tab(text: 'Completed (${completedOrders.length})'),
@@ -99,33 +96,34 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20.r),
               decoration: const BoxDecoration(
                 color: AppColors.primarySurface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.inventory_2_outlined, size: 48, color: AppColors.primary),
+              child: Icon(Icons.inventory_2_outlined, size: 44.sp, color: AppColors.primary),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            SizedBox(height: 16.h),
+            Text(
               'No orders found',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
-            const SizedBox(height: 6),
-            const Text(
+            SizedBox(height: 6.h),
+            Text(
               'Custom builds you order will show up here',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+              style: TextStyle(fontSize: 12.sp, color: AppColors.textSecondary),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             if (widget.onNavigateToTab != null)
               ElevatedButton.icon(
                 onPressed: () => widget.onNavigateToTab!(1),
-                icon: const Icon(Icons.build_circle_outlined, size: 18),
-                label: const Text('Start Custom Build'),
+                icon: Icon(Icons.build_circle_outlined, size: 18.sp),
+                label: Text('Start Custom Build', style: TextStyle(fontSize: 12.sp)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                 ),
               ),
           ],
@@ -134,9 +132,9 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.r),
       itemCount: orders.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 14),
+      separatorBuilder: (context, index) => SizedBox(height: 14.h),
       itemBuilder: (context, index) {
         final order = orders[index];
         return _buildOrderCard(order);
@@ -161,12 +159,12 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: AppColors.border),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 8,
+            blurRadius: 8.r,
             offset: const Offset(0, 3),
           ),
         ],
@@ -176,7 +174,7 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
         children: [
           // Card Header
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.r),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -186,16 +184,16 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                     Expanded(
                       child: Row(
                         children: [
-                          const Icon(Icons.memory_rounded, color: AppColors.primary, size: 20),
-                          const SizedBox(width: 8),
+                          Icon(Icons.memory_rounded, color: AppColors.primary, size: 20.sp),
+                          SizedBox(width: 8.w),
                           Expanded(
                             child: Text(
                               'Order #${order.id}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                                fontSize: 13.sp,
                                 color: AppColors.textPrimary,
                               ),
                             ),
@@ -203,17 +201,17 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                       decoration: BoxDecoration(
                         color: statusBg,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
                         order.status.title,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10.sp,
                           fontWeight: FontWeight.bold,
                           color: statusColor,
                         ),
@@ -221,49 +219,49 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
                 Text(
                   order.buildName,
-                  style: const TextStyle(
-                    fontSize: 16,
+                  style: TextStyle(
+                    fontSize: 15.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Text(
                   '${order.items.length} parts • Ordered on ${order.orderDate}',
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: 11.sp,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
 
                 // Order Tracking Stepper Mini
                 if (!isDelivered && !isCancelled) ...[
                   Row(
                     children: [
-                      const Icon(Icons.autorenew_rounded, size: 16, color: AppColors.primary),
-                      const SizedBox(width: 6),
+                      Icon(Icons.autorenew_rounded, size: 16.sp, color: AppColors.primary),
+                      SizedBox(width: 6.w),
                       Text(
                         'Status: ${order.status.title}',
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: 11.sp,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(4.r),
                     child: LinearProgressIndicator(
                       value: (order.status.stepIndex + 1) / (OrderStatus.values.length - 1),
                       backgroundColor: AppColors.inputBg,
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                      minHeight: 6,
+                      minHeight: 6.h,
                     ),
                   ),
                 ],
@@ -275,18 +273,18 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
 
           // Card Footer
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Total Amount', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                    Text('Total Amount', style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary)),
                     Text(
                       '৳${order.totalAmount.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
                       ),
@@ -306,13 +304,13 @@ class _OrdersViewState extends State<OrdersView> with SingleTickerProviderStateM
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: AppColors.primary),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                       ),
-                      child: const Text(
-                        'Track Rig',
+                      child: Text(
+                        'Track PC',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11.sp,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),

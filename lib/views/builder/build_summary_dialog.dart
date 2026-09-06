@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/widgets/app_network_image.dart';
 import '../../core/widgets/app_notification.dart';
@@ -49,40 +50,40 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.9,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.background,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
       ),
       child: Column(
         children: [
           // Drag Handle
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Container(
-            width: 40,
-            height: 4,
+            width: 40.w,
+            height: 4.h,
             decoration: BoxDecoration(
               color: AppColors.border,
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(2.r),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Rig Summary & Order',
+                Text(
+                  'PC Build Summary & Order',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary),
+                  icon: Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 22.sp),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
@@ -92,27 +93,29 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
           // Body
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Rig Name Edit Field
+                  // PC Name Edit Field
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: EdgeInsets.all(14.r),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(14.r),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.edit_note_rounded, color: AppColors.primary, size: 24),
-                        const SizedBox(width: 10),
+                        Icon(Icons.edit_note_rounded, color: AppColors.primary, size: 24.sp),
+                        SizedBox(width: 10.w),
                         Expanded(
                           child: TextField(
                             controller: _nameController,
-                            decoration: const InputDecoration(
+                            style: TextStyle(fontSize: 14.sp),
+                            decoration: InputDecoration(
                               labelText: 'Custom Build Name',
+                              labelStyle: TextStyle(fontSize: 12.sp),
                               isDense: true,
                               border: InputBorder.none,
                               enabledBorder: InputBorder.none,
@@ -125,16 +128,97 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
+
+                  // Target Budget Analysis Card (if set)
+                  if (widget.customBuildState.hasBudget) ...[
+                    Container(
+                      padding: EdgeInsets.all(14.r),
+                      decoration: BoxDecoration(
+                        color: widget.customBuildState.isOverBudget
+                            ? AppColors.error.withValues(alpha: 0.08)
+                            : AppColors.primarySurface,
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: widget.customBuildState.isOverBudget
+                              ? AppColors.error.withValues(alpha: 0.3)
+                              : AppColors.primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            widget.customBuildState.isOverBudget
+                                ? Icons.warning_amber_rounded
+                                : Icons.account_balance_wallet_rounded,
+                            color: widget.customBuildState.isOverBudget
+                                ? AppColors.error
+                                : AppColors.primary,
+                            size: 24.sp,
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Target Budget: ৳${widget.customBuildState.targetBudget!.toStringAsFixed(0)}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13.sp,
+                                        color: widget.customBuildState.isOverBudget
+                                            ? AppColors.error
+                                            : AppColors.primary,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                      decoration: BoxDecoration(
+                                        color: widget.customBuildState.isOverBudget
+                                            ? AppColors.error
+                                            : AppColors.success,
+                                        borderRadius: BorderRadius.circular(4.r),
+                                      ),
+                                      child: Text(
+                                        widget.customBuildState.isOverBudget
+                                            ? '+৳${widget.customBuildState.budgetOverAmount.toStringAsFixed(0)} Over'
+                                            : '৳${widget.customBuildState.budgetRemaining.toStringAsFixed(0)} Left',
+                                        style: TextStyle(
+                                          fontSize: 10.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 2.h),
+                                Text(
+                                  widget.customBuildState.isOverBudget
+                                      ? 'Your build exceeds your defined budget. You can still order or adjust parts.'
+                                      : 'Awesome! Your build configuration is completely within your target budget.',
+                                  style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                  ],
 
                   // Power & Compatibility Status
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: EdgeInsets.all(14.r),
                     decoration: BoxDecoration(
                       color: widget.customBuildState.isFullyCompatible
                           ? AppColors.success.withValues(alpha: 0.1)
                           : AppColors.warning.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
                         color: widget.customBuildState.isFullyCompatible
                             ? AppColors.success.withValues(alpha: 0.3)
@@ -150,9 +234,9 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                           color: widget.customBuildState.isFullyCompatible
                               ? AppColors.success
                               : AppColors.warning,
-                          size: 24,
+                          size: 24.sp,
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,15 +247,15 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                                     : 'Review Component Compatibility',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                                  fontSize: 13.sp,
                                   color: widget.customBuildState.isFullyCompatible
                                       ? AppColors.success
                                       : AppColors.warning,
                                 ),
                               ),
                               Text(
-                                'Estimated Rig Draw: ${widget.customBuildState.totalEstimatedWattage}W',
-                                style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                                'Estimated Power Draw: ${widget.customBuildState.totalEstimatedWattage}W',
+                                style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary),
                               ),
                             ],
                           ),
@@ -179,22 +263,22 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
 
                   // Selected Parts List
-                  const Text(
+                  Text(
                     'Selected Components',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: ListView.separated(
@@ -205,25 +289,25 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                       itemBuilder: (context, index) {
                         final comp = components[index];
                         return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
                           child: Row(
                             children: [
                               AppNetworkImage(
                                 imageUrl: comp.imageUrl,
-                                width: 44,
-                                height: 44,
-                                borderRadius: BorderRadius.circular(8),
+                                width: 44.w,
+                                height: 44.w,
+                                borderRadius: BorderRadius.circular(8.r),
                                 fallbackIcon: comp.category.icon,
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12.w),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       comp.category.displayName,
-                                      style: const TextStyle(
-                                        fontSize: 10,
+                                      style: TextStyle(
+                                        fontSize: 10.sp,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primary,
                                       ),
@@ -232,8 +316,8 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                                       comp.name,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 13,
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.textPrimary,
                                       ),
@@ -243,8 +327,8 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                               ),
                               Text(
                                 '৳${comp.price.toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  fontSize: 14,
+                                style: TextStyle(
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.textPrimary,
                                 ),
@@ -255,23 +339,23 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                       },
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20.h),
 
                   // Optional Add-on Services
-                  const Text(
+                  Text(
                     'Assembly & Setup Services',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15.sp,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12.r),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16.r),
                       border: Border.all(color: AppColors.border),
                     ),
                     child: Column(
@@ -281,8 +365,8 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                           onChanged: null, // Always included for free
                           activeColor: AppColors.success,
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Free Professional Cable Management', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                          subtitle: const Text('Included Free of Charge', style: TextStyle(fontSize: 11, color: AppColors.success)),
+                          title: Text('Free Professional Cable Management', style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600)),
+                          subtitle: Text('Included Free of Charge', style: TextStyle(fontSize: 10.sp, color: AppColors.success)),
                         ),
                         const Divider(height: 1, color: AppColors.border),
                         CheckboxListTile(
@@ -290,8 +374,8 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                           onChanged: (val) => setState(() => _includeStressTesting = val ?? true),
                           activeColor: AppColors.primary,
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('24h Stress Testing & BIOS Optimization', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                          subtitle: const Text('FREE Promo', style: TextStyle(fontSize: 11, color: AppColors.primary)),
+                          title: Text('24h Stress Testing & BIOS Optimization', style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600)),
+                          subtitle: Text('FREE Promo', style: TextStyle(fontSize: 10.sp, color: AppColors.primary)),
                         ),
                         const Divider(height: 1, color: AppColors.border),
                         CheckboxListTile(
@@ -299,13 +383,13 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                           onChanged: (val) => setState(() => _includeOs = val ?? true),
                           activeColor: AppColors.primary,
                           contentPadding: EdgeInsets.zero,
-                          title: const Text('Windows 11 Pro 64-bit License & Installed', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                          subtitle: const Text('+৳2,500 (Special bundle price)', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          title: Text('Windows 11 Pro 64-bit License & Installed', style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w600)),
+                          subtitle: Text('+৳2,500 (Special bundle price)', style: TextStyle(fontSize: 10.sp, color: AppColors.textSecondary)),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  SizedBox(height: 30.h),
                 ],
               ),
             ),
@@ -313,13 +397,13 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
 
           // Bottom Checkout Bar
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(16.r),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 10,
+                  blurRadius: 10.r,
                   offset: const Offset(0, -4),
                 ),
               ],
@@ -334,11 +418,11 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Grand Total', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                          Text('Grand Total', style: TextStyle(fontSize: 11.sp, color: AppColors.textSecondary)),
                           Text(
                             '৳${grandTotal.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: TextStyle(
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.w800,
                               color: AppColors.primary,
                             ),
@@ -350,32 +434,32 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                           OutlinedButton.icon(
                             onPressed: _isProcessing
                                 ? null
-                                : () => _handleSaveRig(components, grandTotal),
-                            icon: const Icon(Icons.bookmark_outline_rounded, size: 18),
-                            label: const Text('Save Rig'),
+                                : () => _handleSaveBuild(components, grandTotal),
+                            icon: Icon(Icons.bookmark_outline_rounded, size: 16.sp),
+                            label: Text('Save', style: TextStyle(fontSize: 12.sp)),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8.w),
                           ElevatedButton.icon(
                             onPressed: _isProcessing
                                 ? null
                                 : () => _showCheckoutSheet(components, grandTotal),
                             icon: _isProcessing
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                ? SizedBox(
+                                    width: 16.w,
+                                    height: 16.w,
+                                    child: const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                   )
-                                : const Icon(Icons.check_circle_outline_rounded, size: 18),
-                            label: Text(_isProcessing ? 'Processing...' : 'Place Order'),
+                                : Icon(Icons.check_circle_outline_rounded, size: 16.sp),
+                            label: Text(_isProcessing ? 'Wait...' : 'Place Order', style: TextStyle(fontSize: 12.sp)),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
                             ),
                           ),
                         ],
@@ -391,7 +475,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
     );
   }
 
-  Future<void> _handleSaveRig(List<PcComponent> components, double grandTotal) async {
+  Future<void> _handleSaveBuild(List<PcComponent> components, double grandTotal) async {
     final user = AuthService().currentUser;
     final uid = user?.uid ?? 'guest_user';
     setState(() => _isProcessing = true);
@@ -407,7 +491,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Rig successfully saved to your Cloud Profile!'),
+          content: Text('PC build successfully saved to your Cloud Profile!'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -416,7 +500,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
       setState(() => _isProcessing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not save rig: $e'),
+          content: Text('Could not save PC build: $e'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -435,14 +519,14 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
       builder: (sheetCtx) => StatefulBuilder(
         builder: (ctx, setSheetState) => Container(
           padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+            left: 20.w,
+            right: 20.w,
+            top: 20.h,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20.h,
           ),
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24.r)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -451,52 +535,56 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Delivery & Payment',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(Icons.close, size: 22.sp),
                     onPressed: () => Navigator.pop(sheetCtx),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               TextField(
                 controller: addressController,
-                decoration: const InputDecoration(
+                style: TextStyle(fontSize: 13.sp),
+                decoration: InputDecoration(
                   labelText: 'Shipping Address',
-                  prefixIcon: Icon(Icons.location_on_outlined),
+                  labelStyle: TextStyle(fontSize: 12.sp),
+                  prefixIcon: Icon(Icons.location_on_outlined, size: 20.sp),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               TextField(
                 controller: phoneController,
-                decoration: const InputDecoration(
+                style: TextStyle(fontSize: 13.sp),
+                decoration: InputDecoration(
                   labelText: 'Contact Phone',
-                  prefixIcon: Icon(Icons.phone_outlined),
+                  labelStyle: TextStyle(fontSize: 12.sp),
+                  prefixIcon: Icon(Icons.phone_outlined, size: 20.sp),
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text('Payment Method', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
+              SizedBox(height: 16.h),
+              Text('Payment Method', style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.bold)),
+              SizedBox(height: 8.h),
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: 8.w,
+                runSpacing: 8.h,
                 children: [
                   ChoiceChip(
-                    label: const Text('Cash on Delivery'),
+                    label: Text('Cash on Delivery', style: TextStyle(fontSize: 12.sp)),
                     selected: selectedPayment == 'Cash on Delivery',
                     onSelected: (_) => setSheetState(() => selectedPayment = 'Cash on Delivery'),
                   ),
                   ChoiceChip(
-                    label: const Text('bKash / Nagad'),
+                    label: Text('bKash / Nagad', style: TextStyle(fontSize: 12.sp)),
                     selected: selectedPayment == 'bKash / Nagad',
                     onSelected: (_) => setSheetState(() => selectedPayment = 'bKash / Nagad'),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -509,13 +597,16 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
                       paymentMethod: selectedPayment,
                     );
                   },
-                  icon: const Icon(Icons.check_circle_rounded),
-                  label: Text('Confirm Order (৳${grandTotal.toStringAsFixed(0)})'),
+                  icon: Icon(Icons.check_circle_rounded, size: 20.sp),
+                  label: Text(
+                    'Confirm Order (৳${grandTotal.toStringAsFixed(0)})',
+                    style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: EdgeInsets.symmetric(vertical: 14.h),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                 ),
               ),
@@ -581,7 +672,7 @@ class _BuildSummaryDialogState extends State<BuildSummaryDialog> {
       AppNotification.showOrderPlaced(
         context,
         orderId: orderId,
-        buildName: placedBuildName.isEmpty ? 'Custom PC Rig' : placedBuildName,
+        buildName: placedBuildName.isEmpty ? 'Custom PC Build' : placedBuildName,
       );
     } catch (e) {
       if (!mounted) return;

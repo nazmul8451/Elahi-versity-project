@@ -6,7 +6,7 @@ class AppData {
   // Hero Banners
   static const List<Map<String, String>> heroBanners = [
     {
-      'title': 'Build Your Dream Rig',
+      'title': 'Build Your Dream PC',
       'subtitle': 'Live Compatibility Check & Free Express Assembly',
       'badge': 'NEW ARRIVALS 2026',
       'imageUrl': 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=1200&q=80',
@@ -518,7 +518,7 @@ class AppData {
     ),
   ];
 
-  // --- Featured Pre-built Gaming Rigs & Workstations (in BDT ৳) ---
+  // --- Featured Pre-built Gaming PCs & Workstations (in BDT ৳) ---
   static final List<PcBuildModel> featuredPrebuilts = [
     PcBuildModel(
       id: 'rig_1',
@@ -629,7 +629,7 @@ class AppData {
       estimatedDelivery: 'Aug 19, 2026',
       status: OrderStatus.assembly,
       totalAmount: 315000.00,
-      buildName: 'Vortex Titan Custom Rig',
+      buildName: 'Vortex Titan Custom PC',
       items: const [
         OrderItemModel(title: 'AMD Ryzen 7 7800X3D', subtitle: 'AM5, 8C/16T', price: 42500),
         OrderItemModel(title: 'NVIDIA RTX 4080 SUPER 16GB', subtitle: 'ASUS TUF Edition', price: 145000),

@@ -55,7 +55,7 @@ class AuthService {
     return UserModel(
       id: user.uid,
       email: user.email ?? '',
-      name: user.displayName ?? (user.email?.split('@').first ?? 'RigCrafter'),
+      name: user.displayName ?? (user.email?.split('@').first ?? 'PCBuilder'),
       role: 'user',
     );
   }

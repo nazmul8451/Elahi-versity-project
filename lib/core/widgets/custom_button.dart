@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../constants/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -7,14 +8,14 @@ class CustomButton extends StatelessWidget {
   final bool isLoading;
   final bool isFullWidth;
   final double? width;
-  final double height;
+  final double? height;
   final Color backgroundColor;
   final Color textColor;
   final Color? borderColor;
-  final double borderRadius;
+  final double? borderRadius;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
-  final double fontSize;
+  final double? fontSize;
   final FontWeight fontWeight;
   final double elevation;
 
@@ -25,14 +26,14 @@ class CustomButton extends StatelessWidget {
     this.isLoading = false,
     this.isFullWidth = true,
     this.width,
-    this.height = 52.0,
+    this.height,
     this.backgroundColor = AppColors.primary,
     this.textColor = Colors.white,
     this.borderColor,
-    this.borderRadius = 14.0,
+    this.borderRadius,
     this.prefixIcon,
     this.suffixIcon,
-    this.fontSize = 16.0,
+    this.fontSize,
     this.fontWeight = FontWeight.w600,
     this.elevation = 2.0,
   });
@@ -45,14 +46,14 @@ class CustomButton extends StatelessWidget {
     this.isLoading = false,
     this.isFullWidth = true,
     this.width,
-    this.height = 52.0,
+    this.height,
     this.backgroundColor = Colors.transparent,
     this.textColor = AppColors.primary,
     this.borderColor = AppColors.primary,
-    this.borderRadius = 14.0,
+    this.borderRadius,
     this.prefixIcon,
     this.suffixIcon,
-    this.fontSize = 16.0,
+    this.fontSize,
     this.fontWeight = FontWeight.w600,
     this.elevation = 0.0,
   });
@@ -60,10 +61,13 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDisabled = onPressed == null || isLoading;
+    final effectiveHeight = height ?? 50.h;
+    final effectiveRadius = borderRadius ?? 14.r;
+    final effectiveFontSize = fontSize ?? 15.sp;
 
     return SizedBox(
       width: isFullWidth ? double.infinity : width,
-      height: height,
+      height: effectiveHeight,
       child: ElevatedButton(
         onPressed: isDisabled ? null : onPressed,
         style: ElevatedButton.styleFrom(
@@ -74,17 +78,17 @@ class CustomButton extends StatelessWidget {
           elevation: isDisabled ? 0 : elevation,
           shadowColor: backgroundColor.withValues(alpha: 0.35),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
+            borderRadius: BorderRadius.circular(effectiveRadius),
             side: borderColor != null
-                ? BorderSide(color: borderColor!, width: 1.5)
+                ? BorderSide(color: borderColor!, width: 1.5.w)
                 : BorderSide.none,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
         ),
         child: isLoading
             ? SizedBox(
-                height: 22,
-                width: 22,
+                height: 20.r,
+                width: 20.r,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(textColor),
@@ -95,21 +99,21 @@ class CustomButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (prefixIcon != null) ...[
-                    Icon(prefixIcon, color: textColor, size: 20),
-                    const SizedBox(width: 8),
+                    Icon(prefixIcon, color: textColor, size: 18.r),
+                    SizedBox(width: 8.w),
                   ],
                   Text(
                     text,
                     style: TextStyle(
                       color: textColor,
-                      fontSize: fontSize,
+                      fontSize: effectiveFontSize,
                       fontWeight: fontWeight,
                       letterSpacing: 0.3,
                     ),
                   ),
                   if (suffixIcon != null) ...[
-                    const SizedBox(width: 8),
-                    Icon(suffixIcon, color: textColor, size: 20),
+                    SizedBox(width: 8.w),
+                    Icon(suffixIcon, color: textColor, size: 18.r),
                   ],
                 ],
               ),

@@ -145,7 +145,7 @@ class OrderModel {
       totalAmount: (json['totalAmount'] is num)
           ? (json['totalAmount'] as num).toDouble()
           : double.tryParse(json['totalAmount']?.toString() ?? '0') ?? 0.0,
-      buildName: json['buildName']?.toString() ?? 'Custom Rig Build',
+      buildName: json['buildName']?.toString() ?? 'Custom PC Build',
       items: parsedItems,
       shippingAddress: json['shippingAddress']?.toString() ?? '',
       paymentMethod: json['paymentMethod']?.toString() ?? 'Cash on Delivery',
