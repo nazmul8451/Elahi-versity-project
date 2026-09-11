@@ -1,7 +1,7 @@
-# 🖥️ RigCraft - Custom PC Builder & Hardware Store
+# 🖥️ PC Builder App - Custom PC Builder & Hardware Store
 ## 🎓 বিশ্ববিদ্যালয়ের প্রজেক্ট ডিফেন্স ও প্রেজেন্টেশন গাইড (Project Report & Presentation Guide)
 
-> **প্রজেক্টের নাম:** RigCraft (কাস্টম পিসি বিল্ডার ও অনলাইন হার্ডওয়্যার প্ল্যাটফর্ম)  
+> **প্রজেক্টের নাম:** PC Builder App (কাস্টম পিসি বিল্ডার ও অনলাইন হার্ডওয়্যার প্ল্যাটফর্ম)  
 > **প্ল্যাটফর্ম:** ক্রস-প্ল্যাটফর্ম মোবাইল অ্যাপ্লিকেশন (Android / iOS / Web)  
 > **টেকনোলজি স্ট্যাক:** Flutter, Dart, Firebase Authentication, Cloud Firestore  
 > **আর্কিটেকচার:** MVP (Model-View-Presenter) + Reactive Stream-Based Architecture  

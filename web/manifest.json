@@ -1,11 +1,11 @@
 {
-    "name": "elahiversityproject",
-    "short_name": "elahiversityproject",
+    "name": "PC Builder App",
+    "short_name": "PC Builder",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "PC Builder & Hardware E-Commerce Mobile App.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

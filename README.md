@@ -1,6 +1,4 @@
-# Elahi-versity-project
-
-# RigCraft - Custom PC Builder & Hardware Store Mobile App
+# PC Builder App
 
 A modern, high-performance Flutter mobile application for PC building, custom hardware configuration, prebuilt PC purchases, and order tracking.
 
