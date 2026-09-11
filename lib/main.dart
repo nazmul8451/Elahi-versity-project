@@ -18,16 +18,53 @@ class PCBuilderApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MaterialApp(
-          title: 'PC Builder',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          home: const SplashView(),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isLargeScreen = constraints.maxWidth > 600;
+        final responsiveWidth = isLargeScreen ? 480.0 : constraints.maxWidth;
+
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            size: Size(responsiveWidth, constraints.maxHeight),
+          ),
+          child: ScreenUtilInit(
+            designSize: const Size(375, 812),
+            minTextAdapt: true,
+            splitScreenMode: true,
+            builder: (context, child) {
+              return MaterialApp(
+                title: 'PC Builder',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.lightTheme,
+                builder: (context, routerChild) {
+                  if (!isLargeScreen) {
+                    return routerChild ?? const SizedBox.shrink();
+                  }
+                  return Container(
+                    color: const Color(0xFF0F172A),
+                    child: Center(
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 36,
+                              spreadRadius: 4,
+                            ),
+                          ],
+                        ),
+                        clipBehavior: Clip.antiAlias,
+                        child: routerChild,
+                      ),
+                    ),
+                  );
+                },
+                home: const SplashView(),
+              );
+            },
+          ),
         );
       },
     );

@@ -1,0 +1,12 @@
+{
+  "name": "elahi-pc-builder-web",
+  "version": "1.0.0",
+  "description": "PC Builder Flutter Web Application for Vercel Deployment",
+  "scripts": {
+    "build": "bash vercel-build.sh",
+    "vercel-build": "bash vercel-build.sh"
+  },
+  "keywords": ["flutter", "flutter-web", "pc-builder", "vercel"],
+  "author": "",
+  "license": "ISC"
+}
